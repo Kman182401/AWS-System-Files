@@ -1,0 +1,99 @@
+Tier 1: Ultimate Consumer AI Workstation (~$8,000)
+	Specifications:
+		CPU: AMD Ryzen 9 9950X3D (16 cores, 32 threads, up to 5.7 GHz)
+		RAM: 128GB DDR5-6400
+		GPU: NVIDIA GeForce RTX 5090 (32GB GDDR7)
+		Storage: 2x 4TB NVMe Gen4 SSD (RAID 0 for speed)
+		Motherboard: ASUS ROG Crosshair X670E Hero
+		PSU: 1200W Platinum
+		Cooling: 360mm AIO liquid cooler
+		Chassis: Full tower (e.g., Fractal Define 7)
+		Networking: 2.5GbE LAN, WiFi 6E
+		OS: Ubuntu 22.04 LTS or Windows 11 Pro
+		UPS: 1500VA+ pure sine wave
+		Capabilities:
+		Deep Learning: Efficient training and inference of large models.
+		Multi-Agent RL: Supports multiple agents in parallel.
+		Real-Time Data Processing: Handles high-frequency data ingestion and backtesting.
+		Live Trading: Manages medium to large portfolios with real-time risk assessment.
+		Automated Research: Conducts extensive feature and strategy discovery.
+	Effectiveness:
+		Score: 9/10
+		Proficiency: Capable of running 90% of the AI 		superintelligence system's features efficiently.
+	Estimated Cost:
+		Total: $7,800 – $8,200 USD
+	Key Notes:
+		This build offers top-tier performance for AI workloads.
+		Future-proofed with the latest hardware as of 2025.
+		Requires substantial power and cooling solutions.
+
+Tier 2: High-End Consumer AI Workstation (~$6,000)
+	Specifications:
+		CPU: AMD Ryzen 9 9900X3D (12 cores, 24 threads, up to 5.5 GHz)
+		RAM: 64GB DDR5-6000
+		GPU: NVIDIA GeForce RTX 5080 (24GB GDDR7)
+		Storage: 2TB NVMe Gen4 SSD + 4TB SATA SSD
+		Motherboard: ASUS TUF Gaming X670E
+		PSU: 1000W Gold
+		Cooling: 280mm AIO liquid cooler
+		Chassis: Mid tower
+		Networking: 2.5GbE LAN, WiFi 6
+		OS: Ubuntu 22.04 LTS or Windows 11 Pro
+	Capabilities:
+		Deep Learning: Handles medium to large models with moderate efficiency.
+		Multi-Agent RL: Supports several agents with some limitations.
+		Real-Time Data Processing: Manages moderate data ingestion and backtesting.
+		Live Trading: Suitable for small to medium portfolios.
+		Automated Research: Conducts feature and strategy discovery with some queueing.
+	Effectiveness:
+		Score: 8/10
+	Proficiency: Capable of running 80% of the AI superintelligence system's features effectively.
+	Estimated Cost:
+		Total: $5,800 – $6,200 USD
+	Key Notes:
+		Balances performance and cost for demanding AI tasks.
+		May require future upgrades for more intensive workloads.
+
+Tier 3: Mid-Range AI PC (~$4,000)
+	Specifications:
+		CPU: AMD Ryzen 7 9800X3D (8 cores, 16 threads, up to 5.3 GHz)
+		RAM: 32GB DDR5-5600
+		GPU: NVIDIA GeForce RTX 5070 Ti (16GB GDDR7)
+		Storage: 1TB NVMe SSD + 2TB SATA SSD
+		Motherboard: B650 chipset
+		PSU: 850W Gold
+		Cooling: 240mm AIO liquid cooler
+		Chassis: Mid tower
+		Networking: 1GbE LAN, WiFi 6
+		OS: Ubuntu 22.04 LTS or Windows 11 Pro
+	Capabilities:
+		Deep Learning: Suitable for small to medium models; slower training times.
+		Multi-Agent RL: Limited to a few agents with reduced parallelism.
+		Real-Time Data Processing: Handles low to moderate data ingestion.
+Live Trading: Best for small portfolios with lower frequency trading.
+		Automated Research: Basic feature and strategy discovery with significant queueing.
+	Effectiveness:
+		Score: 6.5/10
+		Proficiency: Capable of running 65% of the AI superintelligence system's features with limitations.
+	Estimated Cost:
+		Total: $3,800 – $4,200 USD
+	Key Notes:
+		Offers a balance between performance and affordability.
+		May struggle with more complex AI tasks.
+
+Tier 4: Entry-Level AI PC (~$2,500)
+	Specifications:
+		CPU: AMD Ryzen 5 9600X (6 cores, 12 threads, up to 5.0 GHz)
+		RAM: 16GB DDR5-5200
+		GPU: NVIDIA GeForce RTX 5060 Ti (12GB GDDR7)
+		Storage: 1TB NVMe SSD
+		Motherboard: B650 chipset
+		PSU: 750W Gold
+		Cooling: High-end air cooler
+		Chassis: Mid tower
+		Networking: 1GbE LAN, WiFi 6
+		OS: Ubuntu 22.04 LTS or Windows 11 Pro
+	Capabilities:
+		Deep Learning: Limited to small models; slow training times.
+		Multi-Agent RL: Minimal support; significant limitations.
+		Real-Time Data Processing: Handles basic data ingestion for a few assets.

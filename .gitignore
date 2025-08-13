@@ -1,0 +1,18 @@
+.env
+.env.*
+*.secrets
+*.pem
+*.ppk
+*.key
+*.crt
+*.p12
+*.der
+id_*
+known_hosts
+authorized_keys
+config
+API Key.txt
+JTW_SECRET.txt
+Fernet Key.txt
+Git PAT.txt
+auth_details.json

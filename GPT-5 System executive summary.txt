@@ -1,0 +1,315 @@
+System executive summary (what it is)
+
+Purpose: Real-time multi-source (IBKR market + news) trading system combining engineered features, a PPO RL agent, classical ML classifiers, a stacking meta-model, and a final ensemble voting layer to generate trading signals and optionally execute IBKR orders with risk controls.
+Data sources:
+IBKR via ib_insync for futures/FX (paper by default).
+MarketAux news API with entity extraction and embedding-based relevance scoring; mapped to instruments for signal features.
+Learning stack:
+Base ML: SGDClassifier, Perceptron, PassiveAggressiveClassifier, RandomForestClassifier.
+RL: PPO (Stable-Baselines3) with a custom TradingEnv.
+Meta-model: LogisticRegression trained on base-model predictions (stacking).
+Final signals: Majority vote across model set (with configurable confidence threshold in ensemble PPO runs).
+Storage/infra: S3 bucket omega-singularity-ml used for datasets, models, and news artifacts. Logging via Python logging; IBKR activity logging to ibkr_market_data.log.
+Omega system manifest (AI-readable, concrete values, no secrets)
+Note: All values below are taken from your code or safely inferred from non-sensitive constants. Sensitive values (e.g., API keys) are intentionally masked and not printed.
+
+{
+"system_name": "Omega_Trading_Ensemble_AWS_ML_RL",
+"as_of": "2025-08-09 America/New_York",
+"runtime_files": {
+"last_trained_stamp_file": "last_trained_time.txt"
+},
+"storage": {
+"s3_bucket": "omega-singularity-ml",
+"prefixes": {
+"processed": "processed",
+"news": "news/",
+"models": "models/"
+}
+},
+"ibkr": {
+"host": "127.0.0.1",
+"port": 4002,
+"client_id": 101,
+"market_data_type": "REALTIME",
+"poll_interval_sec": 1,
+"retry_interval_sec": 5,
+"request_timeout_sec": 30,
+"logging": {
+"enabled": true,
+"file": "ibkr_market_data.log",
+"level": "INFO"
+},
+"adapter_defaults": {
+"duration": "1 D",
+"bar_size": "1 min",
+"what_to_show": "TRADES",
+"use_rth": false,
+"format_date": 1,
+"end_datetime": ""
+}
+},
+"risk_limits": {
+"max_daily_loss_pct": 0.02,
+"max_trades_per_day": 20,
+"max_position_exposure": 3,
+"max_order_size": 2
+},
+"instrument_universe": {
+"futures_rl_core": ["ES", "NQ", "6E", "6B", "6A", "GC"],
+"symbols_config": ["ES1!", "NQ1!", "GBPUSD", "EURUSD", "AUDUSD", "XAUUSD"],
+"news_entity_to_ticker_map_examples": {
+"Federal Reserve": ["ES1!", "NQ1!", "GBPUSD", "EURUSD", "AUDUSD"],
+"interest rates": ["ES1!", "NQ1!", "GBPUSD", "EURUSD", "AUDUSD"],
+"inflation": ["ES1!", "NQ1!", "GC", "GBPUSD", "EURUSD", "AUDUSD"],
+"gold": ["GC"],
+"technology": ["NQ1!"],
+"bank": ["ES1!", "NQ1!"]
+}
+},
+"data_io": {
+"ibkr_export_defaults": {
+"data_dir": "/home/ubuntu/data",
+"chunk_days": 30,
+"sleep_secs": 1.0,
+"what_to_show": ["TRADES", "MIDPOINT"],
+"use_rth": false
+},
+"ohlcv_expected_columns": ["timestamp", "open", "high", "low", "close", "volume"]
+},
+"feature_engineering": {
+"technical_indicators": ["RSI", "MACD", "PPO", "ROC", "SMA", "VWAP", "STOCH", "ATR", "BollingerBands"],
+"market_microstructure": ["bid_depth", "ask_depth", "best_bid", "best_ask", "spread", "book_imbalance", "bids", "asks", "ask_size", "bid_size", "vwap"],
+"time_features": ["minute_of_day", "hour", "day_of_week"],
+"returns": ["ret_1", "ret_5", "ret_15", "roll_corr_open"],
+"volatility_volume": ["vol_sma_20", "vol_spike", "atr", "bb_width"],
+"target_columns_if_present": ["label"]
+},
+"news_processing": {
+"ingestion": {
+"provider": "MarketAux",
+"base_url": "https://api.marketaux.com/v1/news/all",
+"api_key": "PRESENT_AND_MASKED",
+"common_request_fields": ["symbols", "published_before", "published_after", "entity_types", "countries", "language", "filter_entities", "must_have_entities", "min_match_score", "sentiment_gte", "sentiment_lte"]
+},
+"nlp_models": {
+"spacy_model": "en_core_web_lg",
+"sentence_transformer": "all-MiniLM-L6-v2"
+},
+"engineered_news_fields": ["entities", "keywords", "topic", "main_topic", "summary", "sentiment_score", "overall_sentiment_score", "similarity", "time_published", "time_published_dt", "relevant_tickers"]
+},
+"ml_ensemble": {
+"base_models": ["SGDClassifier", "Perceptron", "PassiveAggressiveClassifier", "RandomForestClassifier"],
+"meta_model": "LogisticRegression",
+"stacking_features": "Base-model predictions concatenated per timestep",
+"ensemble_voting": "Majority vote across ML models + RL model predictions",
+"ensemble_confidence_threshold": 0.6
+},
+"rl": {
+"library": "stable_baselines3",
+"algorithm": "PPO",
+"env_class": "TradingEnv",
+"action_space": {"type": "Discrete", "size": 3, "mapping": {"0": "hold", "1": "buy", "2": "sell"}},
+"observation_space": {"type": "Box", "shape": "num_numeric_columns_in_feature_dataframe"},
+"initial_balance": 100000,
+"transaction_cost": 0.0005,
+"reward_function": "PnL from previous position * price_diff minus transaction_cost, penalized by risk_penalty_coeff * max_drawdown",
+"risk_penalty_coeff": 0.1,
+"episode_termination": ["end_of_data", "max_drawdown > 0.2"]
+},
+"aws_usage": {
+"boto3_used_for": ["datasets on S3", "model save/load", "model discovery via list_objects_v2"],
+"model_store_layout": "s3://omega-singularity-ml/models/{run_id}/",
+"latest_model_resolution": "list_objects_v2, choose most recent key excluding current run_id when needed"
+},
+"modules": {
+"market_data_config.py": {
+"role": "Global trading limits and IBKR connection defaults",
+"key_values": {
+"IBKR_HOST": "127.0.0.1",
+"IBKR_PORT": 4002,
+"IBKR_CLIENT_ID": 101,
+"MAX_DAILY_LOSS_PCT": 0.02,
+"MAX_TRADES_PER_DAY": 20,
+"MAX_POSITION_EXPOSURE": 3,
+"MAX_ORDER_SIZE": 2,
+"IBKR_MARKET_DATA_TYPE": "REALTIME",
+"IBKR_LOGGING_ENABLED": true,
+"IBKR_LOG_FILE": "ibkr_market_data.log",
+"IBKR_LOG_LEVEL": "INFO",
+"IBKR_DYNAMIC_SUBSCRIPTION": true,
+"IBKR_RESOURCE_MONITORING": true,
+"IBKR_POLL_INTERVAL": 1,
+"IBKR_RETRY_INTERVAL": 5,
+"IBKR_TIMEOUT": 30,
+"IBKR_SYMBOLS": ["ES1!", "NQ1!", "GBPUSD", "EURUSD", "AUDUSD", "XAUUSD"]
+}
+},
+"market_data_ibkr_adapter.py": {
+"class": "IBKRIngestor",
+"methods": {
+"init": {"host_default": "127.0.0.1", "port_default": 4002, "clientId_default": 1},
+"fetch_data": {"args": ["ticker", "duration='1 D'", "barSize='1 min'", "whatToShow='TRADES'", "useRTH=False", "formatDate=1", "endDateTime=''"]},
+"_get_contract": {"purpose": "resolve front month contract per ticker"}
+},
+"helpers": ["get_ibkr_front_month_contract", "expiry_int"]
+},
+"export_ibkr_data_to_csv.py": {
+"functions": ["get_last_timestamp", "ensure_dir", "export_ticker", "main"],
+"defaults": {"DATA_DIR": "/home/ubuntu/data", "CHUNK_DAYS": 30, "SLEEP_SECS": 1.0, "WHAT_TO_SHOW": ["TRADES", "MIDPOINT"], "USE_RTH": false}
+},
+"feature_engineering.py": {
+"functions": ["compute_order_flow_imbalance", "compute_queue_position", "compute_order_book_features", "add_technical_indicators", "process_ticker", "generate_features", "classify_news_type", "map_macro_news_to_tickers", "extract_features_from_level2_market_data"],
+"s3": {"bucket": "omega-singularity-ml", "raw_prefix": "", "processed_prefix": "processed"},
+"tickers": ["ES1!", "NQ1!", "GA", "GE", "GB", "GC"]
+},
+"news_ingestion_marketaux.py": {
+"functions": ["fetch_marketaux_news", "normalize_marketaux_news"],
+"api_key_status": "present_in_code_but_masked_here",
+"base_url": "https://api.marketaux.com/v1/news/all"
+},
+"news_data_utils.py": {
+"functions": ["load_all_news_from_s3", "advanced_entity_and_impact_extraction", "engineer_news_features", "parse_time", "compute_news_embeddings", "find_similar_news"]
+},
+"market_data_utils.py": {
+"functions": ["load_all_news_from_s3", "advanced_entity_and_impact_extraction", "engineer_news_features", "parse_time", "compute_news_embeddings", "find_similar_news"]
+},
+"rl_trading_pipeline.py": {
+"classes": ["PPOTrainingLogger", "TradingEnv", "RLTradingPipeline"],
+"top_level_functions": ["detect_regime", "new_data_available", "execute_trade", "merge_ticker_lists", "detect_feature_drift", "save_model_to_s3", "load_model_from_s3", "get_latest_model_key", "load_all_models", "train_ppo", "run_ppo", "train_ensemble_ppo", "run_ensemble_ppo"],
+"rl": {"algo": "PPO", "env": "TradingEnv"},
+"s3_bucket_reference": "omega-singularity-ml"
+}
+},
+"dependencies_detected": {
+"present": ["boto3", "pandas", "numpy", "ib_insync", "requests", "ta", "sentence_transformers", "spacy", "scikit-learn", "torch", "psutil", "gymnasium", "stable_baselines3", "dateutil"],
+"requirements_file_current": ["boto3", "pandas", "scikit-learn", "joblib", "numpy", "torch", "scikit-learn", "watchtower", "ib_insync"],
+"missing_in_requirements": ["stable-baselines3", "gymnasium", "sentence-transformers", "spacy", "ta", "requests", "python-dateutil", "psutil", "colorlog"]
+}
+}
+
+System behavior and dataflow (end-to-end)
+
+IBKR ingestion
+IBKR defaults: host 127.0.0.1, port 4002 (paper IB Gateway), clientId 101 (config), with an adapter default of clientId=1 (see issues below).
+IBKRIngestor resolves front-month futures contract for target symbols and requests historical bars using duration='1 D', barSize='1 min', whatToShow='TRADES', useRTH=False by default. Results normalized to include timestamp and OHLCV fields.
+2. News ingestion and enrichment
+
+MarketAux API hit at the base_url with filters for tickers, entity types, countries, language, and sentiment thresholds.
+normalize_marketaux_news returns a structured DataFrame.
+advanced_entity_and_impact_extraction (spaCy en_core_web_lg) + compute_news_embeddings (SentenceTransformer all-MiniLM-L6-v2) produce features like entities, keywords, topics, summary, sentiment scores, similarity, and time fields.
+Map news to relevant_tickers via ENTITY_TICKER_MAP; merge or join features for downstream ML/RL.
+3. Feature engineering
+
+add_technical_indicators computes RSI, MACD, PPO, ROC, SMA, VWAP, STOCH, ATR, Bollinger metrics.
+Microstructure features capture L2 signals: bid/ask depth, best bid/ask, spread, book_imbalance, vwap, queue/imbalance metrics.
+Time features minute_of_day/hour/day_of_week and return windows ret_1/ret_5/ret_15, vol_sma_20, vol_spike.
+Outputs: a numeric-heavy DataFrame per instrument; label may be populated if supervised flows are used.
+4. RL environment and PPO training
+
+TradingEnv observation: all numeric columns in the feature frame at current step.
+Action space: Discrete(3) [hold, buy, sell].
+Reward: position PnL (price_diff * prior_position) – transaction_cost (0.0005 * price at trade if position changes) – risk_penalty_coeff * max_drawdown (0.1).
+Episode stops at end-of-data or drawdown > 20%.
+PPOTrainingLogger uses S3 functions to load latest model (excluding current run_id), save updated models, and can detect simple feature drift (mean shift vs reference).
+RLTradingPipeline orchestrates PPO runs (train_ppo/run_ppo) and ensemble PPO (train_ensemble_ppo/run_ensemble_ppo). Ensemble PPO trains multiple PPO models with different seeds; majority-vote action, with a confidence threshold 0.6 below which “hold” is enforced.
+5. Classical ML, stacking, and final ensemble
+
+Base ML models trained per ticker: SGDClassifier, Perceptron, PassiveAggressive, RandomForest.
+Stacking/meta-model: LogisticRegression trained on base-model prediction vectors (meta_X) and true labels (meta_y); persisted to S3 under models/{run_id}/meta_model.joblib.
+Final ensemble voting collects predictions from all ML models and the RL model; votes to produce final_signals per ticker.
+6. Execution and risk management
+
+execute_trade places MarketOrder via ib_insync.
+Risk controls enforced via constants from market_data_config: max daily loss 2%, max trades/day 20, max position exposure 3, max order size 2. Additional hard stop through RL env’s drawdown > 20%.
+Port numbers audit (mandate 7)
+
+market_data_config.py: line 17 — port 4002
+market_data_ibkr_adapter.py: line 43 — port 4002 Result: Only port 4002 found across all files. All files are up to date with the paper IB Gateway port.
+Key values and invariants an assisting AI can rely on (plug-and-play)
+
+IBKR host/port/client_id: 127.0.0.1 / 4002 / 101 (adapter default is 1; see fixes).
+IBKR market data: REALTIME; polling every 1 sec; retry interval 5 sec; timeout 30 sec.
+S3 bucket: omega-singularity-ml; prefixes processed and news/; models under models/{run_id}/.
+Default fetch: 1-min bars, duration 1 D, whatToShow TRADES, useRTH False.
+RL env: action_space 3 (hold/buy/sell); initial_balance 100000; transaction_cost 0.0005; risk_penalty_coeff 0.1; termination at max_drawdown > 0.2.
+Ensemble logic: Base models + RL + optional meta-model; final majority vote; PPO ensemble confidence threshold 0.6 defaults to hold.
+News NLP: spaCy en_core_web_lg; SentenceTransformer all-MiniLM-L6-v2; structured outputs include entities/keywords/summary/sentiment/similarity/time fields and relevant_tickers mappings.
+Dependency and configuration status
+
+Requirements gaps (must install): stable-baselines3, gymnasium, sentence-transformers, spacy, ta, requests, python-dateutil, psutil, colorlog. These are imported/used but missing from requirements.txt.
+Duplicated functions: market_data_utils.py and news_data_utils.py share identical function sets; consider consolidating to one utilities module to avoid skew and drift.
+Referenced but missing modules: audit_logging_utils, ingest_to_s3, market_impact_utils, RealTimeFeatureStore class (referenced by RL code but not defined in uploaded files). These will cause ImportError at runtime unless supplied.
+Inconsistent symbol lists: feature_engineering TICKERS differs from market_data_config IBKR_SYMBOLS and RL’s own IBKR_SYMBOLS. Align to a single source of truth.
+IBKR clientId mismatch: market_data_config sets 101; adapter defaults to 1. Align to 101 (paper environment) or make adapter read config.
+Hard-coded secret: MarketAux API key is present in code. It is not printed here. For security, move to environment variables or AWS Secrets Manager and rotate.
+Minimal runbook to reach “plug-and-play” (detailed, concrete)
+
+Python environment
+Ensure Python 3.10+.
+Install required packages (additions to your current requirements): pip install stable-baselines3 gymnasium sentence-transformers spacy ta requests python-dateutil psutil colorlog
+Install spaCy model: python -m spacy download en_core_web_lg
+2. IBKR paper gateway
+
+Start IB Gateway (paper) and confirm:
+Host: 127.0.0.1
+Port: 4002
+API access enabled, trusted connection allowed if needed.
+Confirm you can reach it by connecting via a simple ib_insync script (no need to share code here).
+3. AWS credentials
+
+Configure credentials with S3 write/list permissions for bucket omega-singularity-ml.
+Validate access: aws s3 ls s3://omega-singularity-ml/
+4. Configuration alignment
+
+Set adapter clientId to 101 so all components agree on one client identity.
+Harmonize instrument lists:
+Choose a single authoritative list (recommended: RL’s futures set ES, NQ, 6E, 6B, 6A, GC + any FX symbols).
+Ensure feature_engineering and market_data_config use this same set.
+Consolidate utilities:
+Keep news_data_utils.py or market_data_utils.py (not both duplicating the same functions). Update imports in RL pipeline accordingly.
+Replace hard-coded MarketAux API key with an environment variable or AWS Secrets Manager, and ensure fetch_marketaux_news reads from that. Do not commit secrets.
+5. Sanity checks before running
+
+Confirm S3 bucket omega-singularity-ml exists and is writable.
+Confirm en_core_web_lg and all-MiniLM-L6-v2 load successfully (small dry-run import tests).
+Confirm internet egress is available for MarketAux API.
+6. Historical data export (optional bootstrap)
+
+Run export_ibkr_data_to_csv.py to build local CSVs under /home/ubuntu/data for each target symbol (default: 1-minute bars, TRADES/MIDPOINT, chunks of 30 days, sleep 1.0s between requests).
+Verify resulting CSVs include timestamp and OHLCV columns expected by feature_engineering.
+7. Feature engineering
+
+Use feature_engineering.generate_features/process_ticker to produce processed datasets in S3 (bucket omega-singularity-ml, prefix processed). Ensure columns include the technical, microstructure, returns, volatility, and time features listed in the manifest.
+8. RL and ensemble training
+
+Run RLTrainingPipeline (rl_trading_pipeline.py) to:
+Ingest/merge features
+Train PPO on TradingEnv
+Train base ML models per ticker
+Train meta-model (LogisticRegression) on model predictions
+Save all models under s3://omega-singularity-ml/models/{run_id}/
+Verify:
+S3 contains models/{run_id}/...
+Logger messages show meta-model trained and ensemble voting completed
+No ImportErrors (if RealTimeFeatureStore/audit_logging_utils/ingest_to_s3/market_impact_utils are still missing, supply or stub them)
+9. Live signal generation / execution safeguards
+
+Ensure MAX_DAILY_LOSS_PCT, MAX_TRADES_PER_DAY, MAX_POSITION_EXPOSURE, MAX_ORDER_SIZE reflect your risk policy.
+Confirm RL env termination on 20% drawdown and transaction_cost=0.0005 meet your cost and risk assumptions.
+In early live paper runs, set ensemble confidence threshold at 0.6 or higher to reduce over-trading; monitor for drift via detect_feature_drift.
+Known issues requiring attention (precise, file-referenced)
+
+rl_trading_pipeline.py: Syntax error detected (“unexpected indent”) near line 1484. This must be corrected before execution.
+rl_trading_pipeline.py imports TICKERS from market_data_config, but market_data_config does not define TICKERS. Either define it in market_data_config or import the correct IBKR_SYMBOLS or the feature_engineering.TICKERS.
+RL references RealTimeFeatureStore (from market_data_utils) which is not defined in the uploaded market_data_utils.py. Provide this class or refactor the pipeline to use available utilities.
+market_data_ibkr_adapter.py default clientId=1, but config uses 101. Align to avoid multi-session collision.
+requirements.txt is missing: stable-baselines3, gymnasium, sentence-transformers, spacy, ta, requests, python-dateutil, psutil, colorlog. Add them and pin versions as needed.
+MarketAux API key exists hard-coded in code. Remove and store securely; rotate immediately.
+AI-oriented notes and invariants (useful for automated assistants)
+
+Observations are derived by selecting only numeric columns from the feature DataFrame; any addition of non-numeric columns will change obs dimensionality. Always ensure numeric-only input to the RL env.
+Reward function form (PnL – cost – risk_penalty_coeff*max_drawdown) introduces dynamic risk regularization; careful when comparing across symbols with differing volatility.
+Ensemble voting expects availability of four named ML models and the RL model per ticker; the meta-model requires base predictions and labels aligned in time. Missing any one of these should trigger a safe fallback (e.g., skip meta/ensemble for that ticker).
+S3 model discovery uses list_objects_v2 and a lexicographic “latest” selection of keys under models/{run_id}/; ensure run_id naming preserves chronological ordering (it does, as it’s YYYYMMDD_HHMMSS).
+News pipeline requires both spaCy and sentence-transformers; if either is unavailable, disable news features for that run (assistant should gracefully degrade by omitting news-derived columns).

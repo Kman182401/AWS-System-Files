@@ -1,0 +1,172 @@
+Omega Singularity (Learning-Only Mode): System & Command Reference
+1. System Overview
+AI trading platform (Ubuntu 22.04, AWS-focused); modular, explainable, self-healing.
+Mode: Historical data intake, feature engineering, ML training, simulated (paper) trading.
+No live trades sent, but architecture/pipeline mirrors production live logic for later extension.
+Data & artifacts versioned in S3; IAM locked to necessary operations only.
+2. Key File & Directory Locations
+System Design: /home/ubuntu/OmegaSingularity/system_overview.md
+Python venv: /home/ubuntu/omega-venv
+S3 Bucket: omega-singularity-ml (us-east-2)
+IAM Policy JSON: ~/s3-policy.json (on EC2 or as .ssh/s3-policy.json locally)
+Test scripts/notebooks: /home/ubuntu/ (list/find as needed)
+All Python: find /home/ubuntu -name "*.py"
+3. Essential Commands
+A. SSH/EC2
+ssh -i /path/to/Kody.pem ubuntu@<EC2_PUBLIC_IP>
+B. Virtualenv/Python
+source omega-venv/bin/activate
+
+
+python3 <your_script.py>
+
+
+python3 -m pip install boto3 jupyter pandas numpy scikit-learn matplotlib
+C. Jupyter (No browser on EC2)
+jupyter notebook --no-browser --port=8888
+
+
+# From local: 
+
+
+ssh -i /path/to/Kody.pem -L 8888:localhost:8888 ubuntu@<EC2_PUBLIC_IP>
+
+
+# Open http://localhost:8888
+D. S3/AWS CLI
+aws sts get-caller-identity
+
+
+aws s3 ls
+
+
+aws s3 ls s3://omega-singularity-ml/
+
+
+aws s3 cp <local_file> s3://omega-singularity-ml/
+
+
+aws s3 cp s3://omega-singularity-ml/<file> <local_path>
+IAM Policy Review
+aws iam list-policies --scope Local
+
+
+aws iam get-policy --policy-arn arn:aws:iam::<account_id>:policy/OmegaSingularityML-S3-LearnOnly
+IAM Policy Example
+{
+
+
+   "Version": "2012-10-17",
+
+
+   "Statement": [
+
+
+       {
+
+
+           "Effect": "Allow",
+
+
+           "Action": ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
+
+
+           "Resource": [
+
+
+               "arn:aws:s3:::omega-singularity-ml",
+
+
+               "arn:aws:s3:::omega-singularity-ml/*"
+
+
+           ]
+
+
+       }
+
+
+   ]
+
+
+}
+E. Linux/Basics
+ls -lh /home/ubuntu/
+
+
+cat <filename>
+
+
+nano <filename>
+F. tmux (Multi-session)
+tmux new -s omega
+
+
+tmux detach            # Ctrl+b, then d
+
+
+tmux ls
+
+
+tmux attach -t omega
+4. Baseline Setup: Checklist
+ Overview doc: present, up-to-date (system_overview.md)
+ EC2/AMI/key/IP: noted for SSH; hostname = ubuntu@ip-...
+ S3 bucket: exists, access confirmed
+ IAM user, role, policy, JSON: present & reviewed
+ Python venv: present (/home/ubuntu/omega-venv), dependencies installed
+ All scripts/notebooks: catalogued
+ All S3 files: listed, log/test output present
+ Legacy/unknown scripts: identified, reviewed
+ All AWS CLI/Linux/tmux commands: functional
+5. Learning-Only Pipeline Summary
+Download/import data → Clean/store in S3 → Feature engineering → ML/similarity/ensembling → Simulated trading → Log/evaluate outputs (S3/local)
+No live trading/broker API invoked; all logic, logging, and security ready for live upgrade.
+
+
+Step 2: Actionable Checklist for Finalizing Your AI Learning-Only Setup
+Infrastructure
+ Confirm EC2 SSH access and security group settings.
+ Attach correct IAM role to EC2 (S3-only permissions).
+ Confirm S3 bucket exists and is accessible.
+Python Environment
+ Activate /home/ubuntu/omega-venv.
+ Install all required Python packages.
+ Confirm Jupyter works via SSH tunnel.
+Data & Artifacts
+ Ensure /home/ubuntu/OmegaSingularity/data/ exists.
+ Upload or simulate market data to S3.
+Pipeline
+ Place all scripts/notebooks in /home/ubuntu/OmegaSingularity/ and catalog them.
+ Run your ML pipeline end-to-end on sample data.
+ Confirm all logs are generated and can be uploaded to S3.
+Testing
+ Test S3 upload/download via AWS CLI and boto3.
+ Test pipeline with both local and S3 data sources.
+ Simulate failures (S3/network, data corruption) and confirm logging/self-healing.
+Audit & Compliance
+ Review IAM policy for least privilege.
+ Ensure all actions are logged and versioned.
+ Update /home/ubuntu/OmegaSingularity/system_overview.md with current state.
+Human Review
+ Document and test human review/override hooks.
+
+
+A. List of Functions to Test (from Your Pipeline)
+fetch_latest_market_data
+get_s3_client
+s3_download_file
+s3_upload_file
+load_data
+preprocess_data
+add_features
+add_advanced_features
+get_model
+train_model
+evaluate_model
+save_model
+walkforward_validation
+explain_model
+upload_log_to_s3
+human_review_hook
+main (integration test for the full pipeline)

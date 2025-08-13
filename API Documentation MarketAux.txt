@@ -1,0 +1,1123 @@
+Getting Started
+Introduction
+Our API is designed to provide global financial and stock market news and analysis to elevate financial apps and identify best performing entities in the news. You are able to generate news feeds based on numerous filters, including entity symbol, type, exchange, industry, country and much more. As well as this, you are able to identify the best or worst performing entities and use this to generate charts.
+
+We support over 5,000 news sources globally in over 30 languages, tracking over 200,000 entities every minute from over 80 markets worldwide.
+
+To get started simply sign up and use your API token in any of the available API endpoints documented below for instant access.
+
+If you have any questions or concerns, feel free to contact us.
+
+If you have issues with your requests, please ensure your GET parameters are URL-encoded.
+
+All text data returned is UTF-8.
+
+All dates are in UTC (GMT).
+
+For more examples and live responses, check out our entity and endpoint overview.
+
+Authentication
+As mentioned above, when you sign up for free you will find your API token on your dashboard. Simply add this to any of our API endpoints as a GET parameter to gain access. Examples of how this is done can be found below.
+
+API Endpoints
+Finance & Market News Available on: All plans
+Endpoint
+GET https://api.marketaux.com/v1/news/all HTTP/1.1
+Get all the latest global financial news and filter by entities identified within articles to build concise news feeds. Also provided is analysis of each entity identified in articles. Note that not every article may have entities identified. To retrieve all news for articles with identified entities, use the parameter must_have_entities, or specify any of the entity params such as symbols or exchanges as defined below to produce more concise results.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+symbols	false	Specify entity symbol(s) which have been identified within the article. Find entity symbols in our entity search endpoint or see our API overview.
+Example: symbols=TSLA,AMZN,MSFT
+entity_types	false	Specify the type of entities which have been identified within the article. Find entity types in our entity type metadata endpoint or see our API overview.
+Example: entity_types=index,equity
+industries	false	Specify the industries of entities which have been identified within the article. Find entity types in our entity industry metadata endpoint or see our API overview.
+Example: industries=Technology,Industrials
+countries	false	Specify the country of the exchange of which entities have been identified within the article. Find countries as part of our entity exchanges metadata endpoint or see our API overview.
+Example: countries=us,ca
+sentiment_gte	false	Use this to find all articles with entities with a sentiment_score of greater than or equal to x.
+Example: sentiment_gte=0 - this will find all articles which are neutral or positive
+
+Sentiment is between -1 and +1. Anything 0 = neutral, above 0 = positive, below 0 = negative. The higher or lower the sentiment score the more positive or negative it is identified as.
+sentiment_lte	false	Use this to find all articles with entities with a sentiment_score of less than or equal to x.
+Example: sentiment_lte=0 - this will find all articles which are neutral or negative
+min_match_score	false	Use this to find all articles with entities with a match_score of geater than or equal to min_match_score.
+filter_entities	false	By default all entities for each article are returned - by setting this to true, only the relevant entities to your query will be returned with each article. For example, if you set symbols=TSLA and filter_entities=true, only "TSLA" entities will be returned with the articles.
+Default: false
+must_have_entities	false	By default all articles are returned, set this to true to ensure that at least one entity has been identified within the article.
+Default: false
+group_similar	false	Group similar articles to avoid displaying multiple articles on the same topic/subject.
+Default: true
+search	false	Use the search as a basic search tool by entering regular search terms or it has more advanced usage to build search queries:
++ signifies AND operation
+| signifies OR operation
+- negates a single token
+" wraps a number of tokens to signify a phrase for searching
+* at the end of a term signifies a prefix query
+( and ) signify precedence
+To use one of these characters literally, escape it with a preceding backslash (\).
+This searches the full body of the text and the title.
+
+Example: "ipo" -nyse (searches for articles which must include the string "ipo" but articles must NOT mention NYSE.)
+
+For more advanced query examples, see our API Examples section.
+domains	false	Comma separated list of domains to include. List of domains can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com,adage.com
+exclude_domains	false	Comma separated list of domains to exclude
+source_ids	false	Comma separated list of source_ids to include. List of source_ids can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com-1,adage.com-1
+exclude_source_ids	false	Comma separated list of source_ids to exclude.
+language	false	Comma separated list of languages to include. Default is all.
+Click here for a list of supported languages.
+Examples: en,es (English + Spanish)
+published_before	false	Find all articles published before the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_after	false	Find all articles published after the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_on	false	Find all articles published on the specified date. Supported formats include: Y-m-d.
+Examples: 2025-08-05
+sort	false	Sort by published_on, entity_match_score, entity_sentiment_score or relevance_score (only available when used in conjunction with search). Default is published_at unless search is used and sorting by published_at is not included, in which case relevance_score is used.
+When using entity_match_score, entity_sentiment_score this will sort by the average of the filtered entities (filter_entities does not need to be applied for this).
+sort_order	false	Sort order of the sort parameter. NOTE: this can only be used with sort = entity_match_score or entity_sentiment_score.
+Options: desc | asc
+Default: desc
+limit	false	Specify the number of articles you want to return in the request. The maximum limit is based on your plan. The default limit is the maximum specified for your plan.
+page	false	Use this to paginate through the result set. Default is 1. Note that the max result set can't exceed 20,000. For example if your limit is 50, the max page you can have is 400 (50 * 400 = 20,000).
+Example: page=2
+Response Objects
+name	description
+meta > found	The number of articles found for the request.
+meta > returned	The number of articles returned on the page. This is useful to determine the end of the result set as if this is lower than limit, there are no more articles after this page.
+meta > limit	The limit based on the limit parameter.
+meta > page	The page number based on the page parameter.
+data > uuid	The unique identifier for an article in our system. Store this and use it to find specific articles using our single article endpoint.
+data > title	The article title.
+data > description	The article meta description.
+data > keywords	The article meta keywords.
+data > snippet	A short snippet of the article body.
+data > url	The URL to the article.
+data > image_url	The URL to the article image.
+data > language	The language of the source.
+data > published_at	The datetime the article was published.
+data > source	The domain of the source.
+data > relevance_score	Relevance score based on the search parameter. If the search parameter is not used, this will be null.
+data > entities > symbol	Symbol of the identified entity.
+data > entities > name	Name of the identified entity.
+data > entities > exchange	Exchange identifier of the identified entity.
+data > entities > exchange_long	Exchange name of the identified entity.
+data > entities > country	Exchange country of the identified entity.
+data > entities > type	Type of the identified entity.
+data > entities > industry	Industry of the identified entity.
+data > entities > match_score	The overall strength of the matching for the identified entity.
+data > entities > sentiment_score	Average sentiment of all highlighted text found for the identified entity.
+data > entities > highlights > highlight	Snippet of text from the article where the entity has been identified.
+data > entities > highlights > sentiment	The sentiment of the highlighed text.
+data > entities > highlights > highlighted_in	Where the highlight was found (title | main_text).
+data > similar	Array of news articles which are very similar to the main article.
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/news/all?symbols=TSLA,AMZN,MSFT&filter_entities=true&language=en&api_token=YOUR_API_TOKEN
+Example Response
+{
+    "meta": {
+        "found": 140037,
+        "returned": 3,
+        "limit": 3,
+        "page": 1
+    },
+    "data": [
+        {
+            "uuid": "70cb577e-c2dd-4dde-b501-f713823a4939",
+            "title": "Trump wins 2024, markets surge globally",
+            "description": "Global markets experience a significant surge following Trump's victory in the 2024 election.",
+            "keywords": "",
+            "snippet": "Donald Trump has won the 2024 presidential election, defeating Vice President Kamala Harris. Trump secured the 270 electoral votes needed for victory after winn...",
+            "url": "https://www.killerstartups.com/trump-wins-2024-markets-surge-globally/",
+            "image_url": "https://images.killerstartups.com/wp-content/uploads/2024/11/Trump-Wins.jpg",
+            "language": "en",
+            "published_at": "2024-11-08T01:24:00.000000Z",
+            "source": "killerstartups.com",
+            "relevance_score": null,
+            "entities": [
+                {
+                    "symbol": "TSLA",
+                    "name": "Tesla, Inc.",
+                    "exchange": null,
+                    "exchange_long": null,
+                    "country": "us",
+                    "type": "equity",
+                    "industry": "Consumer Cyclical",
+                    "match_score": 12.133104,
+                    "sentiment_score": 0.7783,
+                    "highlights": [
+                        {
+                            "highlight": "., majority-owned by Trump, and Tesl[+253 characters]",
+                            "sentiment": 0.7783,
+                            "highlighted_in": "main_text"
+                        }
+                    ]
+                }
+            ],
+            "similar": []
+        },
+        {
+            "uuid": "ed35bdcd-6f6a-4007-9949-b769fbe2e36d",
+            "title": "Amazon.com mulls new multi-billion dollar investment in Anthropic, the Information reports By Reuters",
+            "description": "Amazon.com mulls new multi-billion dollar investment in Anthropic, the Information reports",
+            "keywords": "",
+            "snippet": "(Reuters) -Amazon is in talks for its second multi-billion dollar investment in artificial intelligence startup Anthropic, the Information reported on Thursday,...",
+            "url": "https://www.investing.com/news/stock-market-news/amazoncom-mulls-new-multibillion-dollar-investment-in-anthropic-the-information-reports-3710319",
+            "image_url": "https://i-invdn-com.investing.com/news/amazon_800x533_L_1411373482.jpg",
+            "language": "en",
+            "published_at": "2024-11-07T23:49:09.000000Z",
+            "source": "investing.com",
+            "relevance_score": null,
+            "entities": [
+                {
+                    "symbol": "AMZN",
+                    "name": "Amazon.com, Inc.",
+                    "exchange": null,
+                    "exchange_long": null,
+                    "country": "us",
+                    "type": "equity",
+                    "industry": "Consumer Cyclical",
+                    "match_score": 34.292408,
+                    "sentiment_score": 0,
+                    "highlights": [
+                        {
+                            "highlight": "<em>Amazon.com</em> mulls new multi-billion dollar investment in Anthropic, the Information reports By Reuters",
+                            "sentiment": 0,
+                            "highlighted_in": "title"
+                        }
+                    ]
+                }
+            ],
+            "similar": []
+        },
+        {
+            "uuid": "2ca2cbbf-c613-4d1c-b470-9d1bac3a256a",
+            "title": "Market Soars to Record Highs: November 7, 2024 Stock Market Recap",
+            "description": "The U.S. stock market experienced a historic surge on Thursday, November 7, 2024, as investors reacted to Donald Trump's unexpected victory in the 2024 U.S.",
+            "keywords": "",
+            "snippet": "Why Was the Market Up Today? Trump’s Victory Sparks Rally\n\nThe U.S. stock market experienced a historic surge on Thursday, November 7, 2024, as investors reac...",
+            "url": "https://thestockmarketwatch.com/stock-market-news/market-soars-to-record-highs-november-7-2024-stock-market-recap/48362/",
+            "image_url": "https://thestockmarketwatch.com/stock-market-news/wp-content/uploads/2024/08/5.jpg",
+            "language": "en",
+            "published_at": "2024-11-07T22:28:28.000000Z",
+            "source": "thestockmarketwatch.com",
+            "relevance_score": null,
+            "entities": [
+                {
+                    "symbol": "TSLA",
+                    "name": "Tesla, Inc.",
+                    "exchange": null,
+                    "exchange_long": null,
+                    "country": "us",
+                    "type": "equity",
+                    "industry": "Consumer Cyclical",
+                    "match_score": 17.491323,
+                    "sentiment_score": 0.7783,
+                    "highlights": [
+                        {
+                            "highlight": "<em>Tesla</em>, <em>Inc</em>. (TSLA), wh[+166 characters]",
+                            "sentiment": 0.7783,
+                            "highlighted_in": "main_text"
+                        }
+                    ]
+                }
+            ],
+            "similar": []
+        }
+    ]
+}
+Similar News Available on: All plans
+Endpoint
+GET https://api.marketaux.com/v1/news/similar/uuid HTTP/1.1
+Use this endpoint to find similar stories to a specific article based on its UUID.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+symbols	false	Specify entity symbol(s) which have been identified within the article. Find entity symbols in our entity search endpoint.
+Example: symbols=TSLA,AMZN,MSFT
+entity_types	false	Specify the type of entities which have been identified within the article. Find entity types in our entity type metadata endpoint.
+Example: entity_types=index,equity
+industries	false	Specify the industries of entities which have been identified within the article. Find entity types in our entity industry metadata endpoint.
+Example: industries=Technology,Industrials
+countries	false	Specify the country of the exchange of which entities have been identified within the article. Find countries as part of our entity exchanges metadata endpoint.
+Example: countries=us,ca
+sentiment_gte	false	Use this to find all articles with entities with a sentiment_score of greater than or equal to x.
+Example: sentiment_gte=0 - this will find all articles which are neutral or positive
+sentiment_lte	false	Use this to find all articles with entities with a sentiment_score of less than or equal to x.
+Example: sentiment_lte=0 - this will find all articles which are neutral or negative
+filter_entities	false	By default all entities for each article are returned - by setting this to true, only the relevant entities to your query will be returned with each article. For example, if you set symbols=TSLA and filter_entities=true, only "TSLA" entities will be returned with the articles.
+Default: false
+must_have_entities	false	By default all articles are returned, set this to true to ensure that at least one entity has been identified within the article.
+Default: false
+group_similar	false	Group similar articles to avoid displaying multiple articles on the same topic/subject.
+Default: true
+domains	false	Comma separated list of domains to include. List of domains can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com,adage.com
+exclude_domains	false	Comma separated list of domains to exclude
+source_ids	false	Comma separated list of source_ids to include. List of source_ids can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com-1,adage.com-1
+exclude_source_ids	false	Comma separated list of source_ids to exclude.
+language	false	Comma separated list of languages to include. Default is all.
+Click here for a list of supported languages.
+Examples: en,es (English + Spanish)
+published_before	false	Find all articles published before the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_after	false	Find all articles published after the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_on	false	Find all articles published on the specified date. Supported formats include: Y-m-d.
+Examples: 2025-08-05
+limit	false	Specify the number of articles you want to return in the request. The maximum limit is based on your plan. The default limit is the maximum specified for your plan.
+page	false	Use this to paginate through the result set. Default is 1. Note that the max result set can't exceed 20,000. For example if your limit is 50, the max page you can have is 400 (50 * 400 = 20,000).
+Example: page=2
+Response Objects
+name	description
+meta > found	The number of articles found for the request.
+meta > returned	The number of articles returned on the page. This is useful to determine the end of the result set as if this is lower than limit, there are no more articles after this page.
+meta > limit	The limit based on the limit parameter.
+meta > page	The page number based on the page parameter.
+data > uuid	The unique identifier for an article in our system. Store this and use it to find specific articles using our single article endpoint.
+data > title	The article title.
+data > description	The article meta description.
+data > keywords	The article meta keywords.
+data > snippet	The first 60 characters of the article body.
+data > url	The URL to the article.
+data > image_url	The URL to the article image.
+data > language	The language of the source.
+data > published_at	The datetime the article was published.
+data > source	The domain of the source.
+data > relevance_score	Relevance score based on the article provided.
+data > entities > symbol	Symbol of the identified entity.
+data > entities > name	Name of the identified entity.
+data > entities > exchange	Exchange identifier of the identified entity.
+data > entities > exchange_long	Exchange name of the identified entity.
+data > entities > country	Exchange country of the identified entity.
+data > entities > type	Type of the identified entity.
+data > entities > industry	Industry of the identified entity.
+data > entities > match_score	The overall strength of the matching for the identified entity.
+data > entities > sentiment_score	Average sentiment of all highlighted text found for the identified entity.
+data > entities > highlights > highlight	Snippet of text from the article where the entity has been identified.
+data > entities > highlights > sentiment	The sentiment of the highlighed text.
+data > entities > highlights > highlighted_in	Where the highlight was found (title | main_text).
+data > similar	Array of news articles which are very similar to the main article.
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/news/similar/cc11e3ab-ced0-4a42-9146-e426505e2e67?api_token=YOUR_API_TOKEN&language=en&published_on=2020-12-01
+Example Response
+{
+    "meta": {
+        "found": 222,
+        "returned": 3,
+        "limit": 3,
+        "page": 1
+    },
+    "data": [
+        {
+            "uuid": "489e4ec4-84a9-4628-966c-95c3741c6dfc",
+            "title": "Bitcoin Drops below $47K: Is BTC in a Bear Market?",
+            "description": "Bitcoin's rally seems to have made a sharp U-turn. Is this a short-lived correction or a longer-term trend?",
+            "keywords": "",
+            "snippet": "The market correction that many crypto analysts have been predicting for weeks seems to have finally arrived. Indeed, crypto markets are seeing red across the ...",
+            "url": "https://www.financemagnates.com/cryptocurrency/news/bitcoin-drops-below-47k-is-btc-in-a-bear-market/",
+            "image_url": "https://www.financemagnates.com/wp-content/uploads/2020/02/bitcoin-tightrope.jpg",
+            "language": "en",
+            "published_at": "2021-02-23T11:00:40.000000Z",
+            "source": "financemagnates.com",
+            "relevance_score": 106.05874,
+            "entities": [ ],
+            "similar": [ ]
+        },
+        {
+            "uuid": "61be555e-3120-44b0-ad13-6f985ea92f63",
+            "title": "Bitcoin ETFs vs Spot BTC",
+            "description": "Bitcoin is now the largest and most well-known cryptocurrency. This cryptocurrency has a market cap of several hundred billion dollars and as a result, has ...",
+            "keywords": "",
+            "snippet": "Bitcoin is now the largest and most well-known cryptocurrency. This cryptocurrency has a market cap of several hundred billion dollars and as a result, has mass...",
+            "url": "https://www.benzinga.com/markets/cryptocurrency/21/02/19808328/bitcoin-etfs-vs-spot-btc",
+            "image_url": "https://cdn.benzinga.com/files/imagecache/og_image_social_share_1200x630/images/story/2012/investing.jpg",
+            "language": "en",
+            "published_at": "2021-02-23T21:11:34.000000Z",
+            "source": "benzinga.com",
+            "relevance_score": 95.900276,
+            "entities": [ ],
+            "similar": [ ]
+        },
+        ...
+    ]
+}
+News by UUID Available on: All plans
+Endpoint
+GET https://api.marketaux.com/v1/news/uuid/uuid HTTP/1.1
+Use this endpoint to find specific articles by the UUID which is returned on our search endpoints. This is useful if you wish to store the UUID to return the article later.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+Response Objects
+name	description
+uuid	The unique identifier for an article in our system. Store this and use it to find specific articles using our single article endpoint.
+title	The article title.
+description	The article meta description.
+keywords	The article meta keywords.
+snippet	The first 60 characters of the article body.
+url	The URL to the article.
+image_url	The URL to the article image.
+language	The language of the source.
+published_at	The datetime the article was published.
+source	The domain of the source.
+entities > symbol	Symbol of the identified entity.
+entities > name	Name of the identified entity.
+entities > exchange	Exchange identifier of the identified entity.
+entities > exchange_long	Exchange name of the identified entity.
+entities > country	Exchange country of the identified entity.
+entities > type	Type of the identified entity.
+entities > industry	Industry of the identified entity.
+entities > match_score	The overall strength of the matching for the identified entity.
+entities > sentiment_score	Average sentiment of all highlighted text found for the identified entity.
+entities > highlights > highlight	Snippet of text from the article where the entity has been identified.
+entities > highlights > sentiment	The sentiment of the highlighed text.
+entities > highlights > highlighted_in	Where the highlight was found (title | main_text).
+If no results are found, a resource_not_found error will be returned.
+
+Example Request
+GET https://api.marketaux.com/v1/news/uuid/147013d8-6c2c-4d50-8bad-eb3c8b7f5740?api_token=YOUR_API_TOKEN
+Example Response
+{
+    "uuid": "9b9fb67e-9438-4263-815e-ef6a7d36af07",
+    "title": "Bitcoin (BTC/USD), Ethereum (ETH/USD) Crushed as Cryptocurrency Market is Overrun by Sellers",
+    "description": "The cryptocurrency market has been experiencing wild price swings over the last two days with sellers in complete control as prices slump across the board",
+    "keywords": "",
+    "snippet": "Bitcoin (BTC/USD) Price, Analysis and Chart: Bullish channel is broken in a two day sell-off...",
+    "url": "https://www.dailyfx.com/forex/market_alert/2021/02/23/Bitcoin-BTCUSD-Ethereum-ETHUSD-Crushed-as-Cryptocurrency-Market-is-Overrun-by-Sellers.html",
+    "image_url": "https://a.c-dn.net/b/2jPuVf/headline_shutterstock_365875643.jpg",
+    "language": "en",
+    "published_at": "2021-02-23T10:30:00.000000Z",
+    "source": "dailyfx.com",
+    "entities": [
+        {
+            "symbol": "BTCUSD",
+            "name": "Bitcoin USD",
+            "exchange": "CC",
+            "exchange_long": "Cryptocurrency",
+            "country": "global",
+            "type": "cryptocurrency",
+            "industry": "N/A",
+            "match_score": 82.04055,
+            "sentiment_score": -0.177075,
+            "highlights": [
+                {
+                    "highlight": "<em>Bitcoin</em> (<em>BTC</em>/<em>USD</em>) Price, Analysis and Chart: Bullish channel is broken in a two day sell-off. No specific driver of price action.",
+                    "sentiment": -0.6486,
+                    "highlighted_in": "main_text"
+                },
+                ...
+            ]
+        },
+        {
+            "symbol": "ETHUSD",
+            "name": "Ethereum USD",
+            "exchange": "CC",
+            "exchange_long": "Cryptocurrency",
+            "country": "global",
+            "type": "cryptocurrency",
+            "industry": "N/A",
+            "match_score": 65.22654,
+            "sentiment_score": -0.4215,
+            "highlights": [
+                {
+                    "highlight": "Bitcoin (BTC/<em>USD</em>), <em>Ethereum</em> (<em>ETH</em>/<em>USD</em>) Crushed as Cryptocurrency Market is Overrun by Sellers",
+                    "sentiment": -0.4215,
+                    "highlighted_in": "title"
+                }
+            ]
+        }
+    ]
+}
+Entity Stats (time series) Available on: Standard and above
+Endpoint
+GET https://api.marketaux.com/v1/entity/stats/intraday HTTP/1.1
+Get an intraday view of how well entities performed over different intervals using this endpoint. Find the best or worst performing entities broken down to every minute, hour, day, week, month, quarter or year. Useful for comparing entities and creating graphs and charts
+
+Adding symbols to the request is not necessary - by default all of the best performing stocks are returned. Filter entities by symbols, exchanges, industries, countries, entity types and more.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+interval	false	The interval of the time series.
+
+Options: minute | hour | day | week | month | quarter | year
+Default: day
+Example: interval=day
+
+Note: there are restrictions on the maximum time frame for each interval. This is based on the published_before parameter. From the published_before date specified, the maximum time frame that can be retrieved is as following:
+
+minute = 7 days
+hour = 1 month
+day = 3 years
+week = 5 years
+month = 5 years
+quarter = 10 years
+year = 10 years
+
+By default the maximum allowed time frame will be applied. If the time frame is exceeded by the date parameters provided, the default will be applied - no error will be thrown.
+
+For example, if interval=minute and published_before=2021-01-10, the max that can be returned will be back to 2021-01-03. You can specify a published_after value to reduce this time frame if necessary (e.g. published_after=2021-01-08).
+group_by	false	Group results by symbol | exchange | industry | country
+Default: symbol
+min_doc_count	false	The minimum number of total_documents an entity should be identified within to be returned with the results.
+Example: min_doc_count=10
+symbols	false	Specify entity symbol(s) which have been identified within the article. Find entity symbols in our entity search endpoint.
+Example: symbols=TSLA,AMZN,MSFT
+entity_types	false	Specify the type of entities which have been identified within the article. Find entity types in our entity type metadata endpoint.
+Example: entity_types=index,equity
+industries	false	Specify the industries of entities which have been identified within the article. Find entity types in our entity industry metadata endpoint.
+Example: industries=Technology,Industrials
+countries	false	Specify the country of the exchange of which entities have been identified within the article. Find countries as part of our entity exchanges metadata endpoint.
+Example: countries=us,ca
+sentiment_avg_gte	false	Use this to refine results to find all entities with an overall sentiment_avg greater than or equal to x.
+Example: sentiment_avg_gte=0 - this will find all entities which are neutral or positive
+sentiment_avg_lte	false	Use this to refine results to find all entities with an overall sentiment_avg less than or equal to x.
+Example: sentiment_avg_lte=0 - this will find all entities which are neutral or negative
+sentiment_gte	false	Use this to refine results to find all documents for entities with a sentiment_score greater than or equal to x.
+Example: sentiment_gte=0 - this will find all document entities which are neutral or positive
+sentiment_lte	false	Use this to refine results to find all documents for entities with a sentiment_score less than or equal to x.
+Example: sentiment_lte=0 - this will find all document entities which are neutral or negative
+search	false	Use the search as a basic search tool by entering regular search terms or it has more advanced usage to build search queries:
++ signifies AND operation
+| signifies OR operation
+- negates a single token
+" wraps a number of tokens to signify a phrase for searching
+* at the end of a term signifies a prefix query
+( and ) signify precedence
+To use one of these characters literally, escape it with a preceding backslash (\).
+This searches the full body of the text and the title.
+
+Example: "ipo" -nyse (searches for articles which must include the string "ipo" but articles must NOT mention NYSE.)
+
+For more advanced query examples, see our API Examples section.
+domains	false	Comma separated list of domains to include. List of domains can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com,adage.com
+exclude_domains	false	Comma separated list of domains to exclude
+source_ids	false	Comma separated list of source_ids to include. List of source_ids can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com-1,adage.com-1
+exclude_source_ids	false	Comma separated list of source_ids to exclude.
+language	false	Comma separated list of languages to include. Default is all.
+Click here for a list of supported languages.
+Examples: en,es (English + Spanish)
+published_before	false	Refine results for articles before the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_after	false	Refine results for articles published after the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_on	false	Refine results for articles published on the specified date. Supported formats include: Y-m-d.
+Examples: 2025-08-05
+sort	false	Sort by total_documents or sentiment_avg
+Default: total_documents
+sort_order	false	Sort order of the sort parameter.
+Options: desc | asc
+Default: desc
+date_order	false	Ordering of the date keys.
+Options: desc | asc
+Default: desc
+limit	false	Specify the number of entities you want to return in the request. The maximum limit is based on your plan. The default limit is the maximum specified for your plan.
+Response Objects
+name	description
+data > date	Date of the time series data.
+data > data > key	The key based on the group_by parameter. For example, this could be symbol, exchange, industry or country.
+data > data > total_documents	Total number of documents identified for the key and also based on the query parameters provided.
+data > data > sentiment_avg	Average sentiment of the key and also based on the query parameters provided.
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/entity/stats/intraday?symbols=TSLA,AMZN,MSFT&interval=day&published_after=2025-08-04T11:43&language=en&api_token=YOUR_API_TOKEN
+Example Response
+{
+    "data": [
+        {
+            "date": "2024-11-10T00:00:00.000Z",
+            "data": [
+                {
+                    "key": "TSLA",
+                    "total_documents": 14,
+                    "sentiment_avg": 0.388841356283852
+                },
+                {
+                    "key": "MSFT",
+                    "total_documents": 10,
+                    "sentiment_avg": 0.3902672976255417
+                },
+                {
+                    "key": "AMZN",
+                    "total_documents": 1,
+                    "sentiment_avg": 0.7039710283279419
+                }
+            ]
+        },
+        {
+            "date": "2024-11-09T00:00:00.000Z",
+            "data": [
+                {
+                    "key": "AMZN",
+                    "total_documents": 0,
+                    "sentiment_avg": null
+                },
+                {
+                    "key": "MSFT",
+                    "total_documents": 0,
+                    "sentiment_avg": null
+                },
+                {
+                    "key": "TSLA",
+                    "total_documents": 0,
+                    "sentiment_avg": null
+                }
+            ]
+        }
+    ]
+}
+Entity Stats (aggregation) Available on: Standard and above
+Endpoint
+GET https://api.marketaux.com/v1/entity/stats/aggregation HTTP/1.1
+Similar to the entity stats time series endpoint, this returns an aggregation of entities for a single time frame, rather than being broken down by date. Useful to find the best or worst performing stocks.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+group_by	false	Group results by symbol | exchange | industry | country
+Default: symbol
+min_doc_count	false	The minimum number of total_documents an entity should be identified within to be returned with the results.
+Example: min_doc_count=10
+symbols	false	Specify entity symbol(s) which have been identified within the article. Find entity symbols in our entity search endpoint.
+Example: symbols=TSLA,AMZN,MSFT
+entity_types	false	Specify the type of entities which have been identified within the article. Find entity types in our entity type metadata endpoint.
+Example: entity_types=index,equity
+industries	false	Specify the industries of entities which have been identified within the article. Find entity types in our entity industry metadata endpoint.
+Example: industries=Technology,Industrials
+countries	false	Specify the country of the exchange of which entities have been identified within the article. Find countries as part of our entity exchanges metadata endpoint.
+Example: countries=us,ca
+sentiment_avg_gte	false	Use this to refine results to find all entities with an overall sentiment_avg greater than or equal to x.
+Example: sentiment_avg_gte=0 - this will find all entities which are neutral or positive
+sentiment_avg_lte	false	Use this to refine results to find all entities with an overall sentiment_avg less than or equal to x.
+Example: sentiment_avg_lte=0 - this will find all entities which are neutral or negative
+sentiment_gte	false	Use this to refine results to find all documents for entities with a sentiment_score greater than or equal to x.
+Example: sentiment_gte=0 - this will find all document entities which are neutral or positive
+sentiment_lte	false	Use this to refine results to find all documents for entities with a sentiment_score less than or equal to x.
+Example: sentiment_lte=0 - this will find all document entities which are neutral or negative
+search	false	Use the search as a basic search tool by entering regular search terms or it has more advanced usage to build search queries:
++ signifies AND operation
+| signifies OR operation
+- negates a single token
+" wraps a number of tokens to signify a phrase for searching
+* at the end of a term signifies a prefix query
+( and ) signify precedence
+To use one of these characters literally, escape it with a preceding backslash (\).
+This searches the full body of the text and the title.
+
+Example: "ipo" -nyse (searches for articles which must include the string "ipo" but articles must NOT mention NYSE.)
+
+For more advanced query examples, see our API Examples section.
+domains	false	Comma separated list of domains to include. List of domains can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com,adage.com
+exclude_domains	false	Comma separated list of domains to exclude
+source_ids	false	Comma separated list of source_ids to include. List of source_ids can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com-1,adage.com-1
+exclude_source_ids	false	Comma separated list of source_ids to exclude.
+language	false	Comma separated list of languages to include. Default is all.
+Click here for a list of supported languages.
+Examples: en,es (English + Spanish)
+published_before	false	Refine results for articles published before the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_after	false	Refine results for articles published after the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_on	false	Refine results for articles published on the specified date. Supported formats include: Y-m-d.
+Examples: 2025-08-05
+sort	false	Sort by total_documents or sentiment_avg
+Default: total_documents
+sort_order	false	Sort order of the sort parameter.
+Options: desc | asc
+Default: desc
+limit	false	Specify the number of entities you want to return in the request. The maximum limit is based on your plan. The default limit is the maximum specified for your plan.
+Response Objects
+name	description
+meta > returned	The number of entities returned.
+meta > limit	The limit based on the limit parameter.
+data > key	The key based on the group_by parameter. For example, this could be symbol, exchange, industry or country.
+data > total_documents	Total number of documents identified for the key and also based on the query parameters provided.
+data > sentiment_avg	Average sentiment of the key and also based on the query parameters provided.
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/entity/stats/aggregation?symbols=TSLA,AMZN,MSFT&published_after=2025-08-04T11:43&language=en&api_token=YOUR_API_TOKEN
+Example Response
+{
+    "meta": {
+        "returned": 3,
+        "limit": 100
+    },
+    "data": [
+        {
+            "key": "TSLA",
+            "total_documents": 14,
+            "sentiment_avg": 0.388841356283852
+        },
+        {
+            "key": "MSFT",
+            "total_documents": 10,
+            "sentiment_avg": 0.3902672976255417
+        },
+        {
+            "key": "AMZN",
+            "total_documents": 1,
+            "sentiment_avg": 0.7039710283279419
+        }
+    ]
+}
+Trending Entities Available on: Standard and above
+Endpoint
+GET https://api.marketaux.com/v1/entity/trending/aggregation HTTP/1.1
+Use this endpoint to identify trending entities. Filter by time frame and much more; e.g. find which stocks were trending on a specific day, within the past 24 hours, past 7 days, etc.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+group_by	false	Group results by symbol | exchange | industry | country
+Default: symbol
+min_doc_count	false	The minimum number of total_documents an entity should be identified within to be returned with the results.
+Example: min_doc_count=10
+symbols	false	Specify entity symbol(s) which have been identified within the article. Find entity symbols in our entity search endpoint.
+Example: symbols=TSLA,AMZN,MSFT
+entity_types	false	Specify the type of entities which have been identified within the article. Find entity types in our entity type metadata endpoint.
+Example: entity_types=index,equity
+industries	false	Specify the industries of entities which have been identified within the article. Find entity types in our entity industry metadata endpoint.
+Example: industries=Technology,Industrials
+countries	false	Specify the country of the exchange of which entities have been identified within the article. Find countries as part of our entity exchanges metadata endpoint.
+Example: countries=us,ca
+sentiment_avg_gte	false	Use this to refine results to find all entities with an overall sentiment_avg greater than or equal to x.
+Example: sentiment_avg_gte=0 - this will find all entities which are neutral or positive
+sentiment_avg_lte	false	Use this to refine results to find all entities with an overall sentiment_avg less than or equal to x.
+Example: sentiment_avg_lte=0 - this will find all entities which are neutral or negative
+sentiment_gte	false	Use this to refine results to find all documents for entities with a sentiment_score greater than or equal to x.
+Example: sentiment_gte=0 - this will find all document entities which are neutral or positive
+sentiment_lte	false	Use this to refine results to find all documents for entities with a sentiment_score less than or equal to x.
+Example: sentiment_lte=0 - this will find all document entities which are neutral or negative
+search	false	Use the search as a basic search tool by entering regular search terms or it has more advanced usage to build search queries:
++ signifies AND operation
+| signifies OR operation
+- negates a single token
+" wraps a number of tokens to signify a phrase for searching
+* at the end of a term signifies a prefix query
+( and ) signify precedence
+To use one of these characters literally, escape it with a preceding backslash (\).
+This searches the full body of the text and the title.
+
+Example: "ipo" -nyse (searches for articles which must include the string "ipo" but articles must NOT mention NYSE.)
+
+For more advanced query examples, see our API Examples section.
+domains	false	Comma separated list of domains to include. List of domains can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com,adage.com
+exclude_domains	false	Comma separated list of domains to exclude
+source_ids	false	Comma separated list of source_ids to include. List of source_ids can be obtained through our Sources endpoint, found further down this page.
+Example: adweek.com-1,adage.com-1
+exclude_source_ids	false	Comma separated list of source_ids to exclude.
+language	false	Comma separated list of languages to include. Default is all.
+Click here for a list of supported languages.
+Examples: en,es (English + Spanish)
+published_before	false	Refine results for articles published before the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_after	false	Refine results for articles published after the specified date. Supported formats include: Y-m-d\TH:i:s | Y-m-d\TH:i | Y-m-d\TH | Y-m-d | Y-m | Y.
+Examples: 2025-08-05T11:43:17 | 2025-08-05T11:43 | 2025-08-05T11 | 2025-08-05 | 2025-08 | 2025
+published_on	false	Refine results for articles published on the specified date. Supported formats include: Y-m-d.
+Examples: 2025-08-05
+sort	false	Sort by total_documents or sentiment_avg
+Default: total_documents
+sort_order	false	Sort order of the sort parameter.
+Options: desc | asc
+Default: desc
+limit	false	Specify the number of entities you want to return in the request. The maximum limit is based on your plan. The default limit is the maximum specified for your plan.
+Response Objects
+name	description
+meta > returned	The number of entities returned.
+meta > limit	The limit based on the limit parameter.
+data > key	The key based on the group_by parameter. For example, this could be symbol, exchange, industry or country.
+data > total_documents	Total number of documents identified for the key and also based on the query parameters provided.
+data > sentiment_avg	Average sentiment of the key and also based on the query parameters provided.
+data > score	The relevance score for the trending entity.
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/entity/trending/aggregation?countries=us,ca&min_doc_count=10&published_after=2025-08-04T11:43&language=en&api_token=YOUR_API_TOKEN
+Example Response
+{
+    "meta": {
+        "returned": 6,
+        "limit": 100
+    },
+    "data": [
+        {
+            "key": "NVDA",
+            "total_documents": 22,
+            "sentiment_avg": 0.436025815253908,
+            "score": 3.7920454395721324
+        },
+        {
+            "key": "NFLX",
+            "total_documents": 10,
+            "sentiment_avg": 0.36096001267433164,
+            "score": 1.5599799973797657
+        },
+        {
+            "key": "GOOGL",
+            "total_documents": 13,
+            "sentiment_avg": 0.33965538614071333,
+            "score": 1.0160208537054916
+        },
+        {
+            "key": "TSLA",
+            "total_documents": 14,
+            "sentiment_avg": 0.388841356283852,
+            "score": 0.909312277726888
+        },
+        {
+            "key": "AAPL",
+            "total_documents": 15,
+            "sentiment_avg": 0.35368599829574426,
+            "score": 0.8730554852539848
+        },
+        ...
+    ]
+}
+Entity Search Available on: All plans
+Endpoint
+GET https://api.marketaux.com/v1/entity/search HTTP/1.1
+Use this endpoint to search for all entities we support. Note that the limit is 50 for all requests.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+search	false	Dynamic search function to find entities.
+symbols	false	Enter specific symbols to return.
+exchanges	false	Filter results by specific exchanges. Comma separated list.
+types	false	Filter results by entity types. Comma separated list.
+industries	false	Filter results by industries. Comma separated list.
+countries	false	Filter results by ISO 3166-1 two-letter country code of the exchange. Comma separated list.
+page	false	Use this to paginate through the result set. Default is 1.
+Example: page=2
+Response Objects
+name	description
+meta > found	The number of entities found for the request.
+meta > returned	The number of entities returned on the page.
+meta > limit	The limit is 50. This currently can not be changed.
+meta > page	The page number based on the page parameter.
+data > symbol	Unique entity symbol (or ticker).
+data > name	Entity name.
+data > type	The entity type.
+data > industry	The entity industry.
+data > exchange	The exchange identifier.
+data > exchange_long	The exchange name.
+data > country	The ISO 3166-1 two-letter country code of the exchange locale. (Note: 'eu' (European Union) and 'global' are also included in our list).
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/entity/search?search=tsla&countries=us&api_token=YOUR_API_TOKEN
+Example Response
+{
+    "meta": {
+        "found": 1,
+        "returned": 1,
+        "limit": 50,
+        "page": 1
+    },
+    "data": [
+        {
+            "symbol": "TSLA",
+            "name": "Tesla, Inc.",
+            "type": "equity",
+            "industry": "Consumer Cyclical",
+            "exchange": null,
+            "exchange_long": null,
+            "country": "us"
+        }
+    ]
+}
+Entity Type List Available on: All plans
+Endpoint
+GET https://api.marketaux.com/v1/entity/type/list HTTP/1.1
+Use this endpoint to return all supported entity types.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+Response Objects
+name	description
+data	Array of entity types.
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/entity/type/list?api_token=YOUR_API_TOKEN
+Example Response
+{
+    "data": [
+        "equity",
+        "index",
+        "etf",
+        "mutualfund",
+        "currency",
+        "cryptocurrency"
+    ]
+}
+Industry List Available on: All plans
+Endpoint
+GET https://api.marketaux.com/v1/entity/industry/list HTTP/1.1
+Use this endpoint to return all supported entity industries.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+Response Objects
+name	description
+data	Array of industries.
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/entity/industry/list?api_token=YOUR_API_TOKEN
+Example Response
+{
+    "data": [
+        "Technology",
+        "Industrials",
+        "N/A",
+        "Consumer Cyclical",
+        "Healthcare",
+        "Communication Services",
+        "Financial Services",
+        "Consumer Defensive",
+        "Basic Materials",
+        "Real Estate",
+        "Energy",
+        "Utilities",
+        "Financial",
+        "Services",
+        "Consumer Goods",
+        "Industrial Goods"
+    ]
+}
+Sources Available on: All plans
+Endpoint
+GET https://api.marketaux.com/v1/news/sources HTTP/1.1
+Use this endpoint to view sources which can be used in other API requests. Note that the limit is 50 for all requests.
+
+HTTP GET Parameters
+name	required	description
+api_token	true	Your API token which can be found on your account dashboard.
+distinct_domain	false	Use this to group distinct domains from sources. This will make source_id null.
+Example: distinct_domain=true
+language	false	Comma separated list of languages to include. Default is all.
+Click here for a list of supported languages.
+Examples: en,es (English + Spanish)
+page	false	Use this to paginate through the result set. Default is 1.
+Example: page=2
+Response Objects
+name	description
+meta > found	The number of sources found for the request.
+meta > returned	The number of sources returned on the page.
+meta > limit	The limit is 50. This currently can not be changed.
+meta > page	The page number based on the page parameter.
+data > source_id	The unique ID of the source feed. Use this for the source_ids or exclude_source_ids parameters in the news endpoints. There may be many source_ids for each domain, therefore we would generally suggest using the domains filter instead the source_ids filter.
+data > domain	The domain of the source. You can use this for the domains or exclude_domains parameters in the news endpoints.
+data > language	The source language.
+If no results are found, the data object will be empty.
+
+Example Request
+GET https://api.marketaux.com/v1/news/sources?api_token=YOUR_API_TOKEN&language=en
+Example Response
+{
+    "meta": {
+        "found": 5327,
+        "returned": 50,
+        "limit": 50,
+        "page": 1
+    },
+    "data": [
+        {
+            "source_id": "adweek.com-1",
+            "domain": "adweek.com",
+            "language": "en"
+        },
+        {
+            "source_id": "adage.com-1",
+            "domain": "adage.com",
+            "language": "en"
+        },
+        {
+            "source_id": "avc.com-1",
+            "domain": "avc.com",
+            "language": "en"
+        },
+        ...
+    ]
+}
+Errors
+Errors
+If your request was unsuccessful, you will receive a JSON formatted error. Below you will find the potential errors you may encounter when using the API.
+
+Errors
+error code	HTTP status	description
+malformed_parameters	400	Validation of parameters failed. The failed parameters are usually shown in the error message.
+invalid_api_token	401	Invalid API token.
+usage_limit_reached	402	Usage limit of your plan has been reached. Usage limit and remaining requests can be found on the X-UsageLimit-Limit header.
+endpoint_access_restricted	403	Access to the endpoint is not available on your current subscription plan.
+resource_not_found	404	Resource could not be found.
+invalid_api_endpoint	404	API route does not exist.
+rate_limit_reached	429	Too many requests in the past 60 seconds. Rate limit and remaining requests can be found on the X-RateLimit-Limit header.
+server_error	500	A server error occured.
+maintenance_mode	503	The service is currently under maintenance.
+Example Error Response
+{
+    "error": {
+        "code": "malformed_parameters",
+        "message": "The published_before parameter(s) are incorrectly formatted."
+    }
+}
+Examples
+API Examples
+There are unlimited ways to filter and refine your results with our API, see a few examples below to help you get started.
+
+If you need assistance creating the perfect query, feel free to contact us.
+
+Retrieve all articles which have mentioned AAPL and TSLA, and filter the entities array so ONLY these are displayed with articles
+GET https://api.marketaux.com/v1/news/all?symbols=AAPL,TSLA&filter_entities=true&api_token=YOUR_API_TOKEN
+Find all articles with positive entity sentiment in English
+GET https://api.marketaux.com/v1/news/all?sentiment_gte=0.1&language=en&api_token=YOUR_API_TOKEN
+Find all articles with neutral entity sentiment in English
+GET https://api.marketaux.com/v1/news/all?sentiment_gte=0&sentiment_lte=0&language=en&api_token=YOUR_API_TOKEN
+Find all articles with negative entity sentiment in English
+GET https://api.marketaux.com/v1/news/all?sentiment_lte=-0.1&language=en&api_token=YOUR_API_TOKEN
+Get a day-by-day breakdown of top mentioned entities for exchanges in the US for last month (July 2025)
+GET https://api.marketaux.com/v1/entity/stats/intraday?interval=day&group_by=symbol&countries=us&published_after=2025-07-01T00:00&published_before=2025-07-31T23:59&api_token=YOUR_API_TOKEN
+Get an aggregation for the top entities by sentiment yesterday (04 August 2025)
+GET https://api.marketaux.com/v1/entity/stats/intraday?group_by=symbol&sort=sentiment_avg&sort_order=desc&published_on=2025-08-04&api_token=YOUR_API_TOKEN
+Code Examples
+See our prepared examples below to quickly get started implementing our API into your next project.
+
+PHP
+$queryString = http_build_query([
+    'api_token' => 'YOUR_API_TOKEN',
+    'symbols' => 'AAPL,TSLA',
+    'filter_entities' => 'true',
+    'limit' => 50,
+]);
+
+$ch = curl_init(sprintf('%s?%s', 'https://api.marketaux.com/v1/news/all', $queryString));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$json = curl_exec($ch);
+
+curl_close($ch);
+
+$apiResult = json_decode($json, true);
+
+print_r($apiResult);
+Python
+# Python 3
+import http.client, urllib.parse
+
+conn = http.client.HTTPSConnection('api.marketaux.com')
+
+params = urllib.parse.urlencode({
+    'api_token': 'YOUR_API_TOKEN',
+    'symbols': 'AAPL,TSLA',
+    'limit': 50,
+    })
+
+conn.request('GET', '/v1/news/all?{}'.format(params))
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode('utf-8'))
+Go
+package main
+
+import (
+    "fmt"
+    "io/ioutil"
+    "net/http"
+    "net/url"
+)
+
+func main() {
+    baseURL, _ := url.Parse("https://marketaux.com")
+
+    baseURL.Path += "v1/news/all"
+
+    params := url.Values{}
+    params.Add("api_token", "YOUR_API_TOKEN")
+    params.Add("symbols", "aapl,tsla")
+    params.Add("search", "ipo")
+    params.Add("limit", "50")
+
+    baseURL.RawQuery = params.Encode()
+
+    req, _ := http.NewRequest("GET", baseURL.String(), nil)
+
+    res, _ := http.DefaultClient.Do(req)
+
+    defer res.Body.Close()
+
+    body, _ := ioutil.ReadAll(res.Body)
+
+    fmt.Println(string(body))
+}
+JavaScript
+var requestOptions = {
+    method: 'GET'
+};
+
+var params = {
+    api_token: 'YOUR_API_TOKEN',
+    symbols: 'msft,fb',
+    limit: '50'
+};
+
+var esc = encodeURIComponent;
+var query = Object.keys(params)
+    .map(function(k) {return esc(k) + '=' + esc(params[k]);})
+    .join('&');
+
+fetch("https://api.marketaux.com/v1/news/all?" + query, requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+C#
+var client = new RestClient("https://api.marketaux.com/v1/news/all");
+client.Timeout = -1;
+
+var request = new RestRequest(Method.GET);
+
+request.AddQueryParameter("api_token", "YOUR_API_TOKEN");
+request.AddQueryParameter("symbols", "aapl,amzn");
+request.AddQueryParameter("limit", "50");
+
+IRestResponse response = client.Execute(request);
+Console.WriteLine(response.Content);
+Java
+OkHttpClient client = new OkHttpClient().newBuilder()
+  .build();
+
+HttpUrl.Builder httpBuilder = HttpUrl.parse("https://api.marketaux.com/v1/news/all").newBuilder();
+httpBuilder.addQueryParameter("api_token", "YOUR_API_TOKEN");
+httpBuilder.addQueryParameter("symbols", "aapl,msft");
+httpBuilder.addQueryParameter("limit", "50");
+
+Request request = new Request.Builder().url(httpBuilder.build()).build();
+
+Response response = client.newCall(request).execute();
+marketaux © Copyright 2025
+
+ API Overview  FAQs  Terms and Conditions  Privacy

@@ -1,0 +1,238 @@
+Notepad-ready master list (with nested plain-text bullets and consistent indentation)
+
+Environment setup (Python + NLP)
+
+Install deps — core packages
+COMMAND: pip install stable-baselines3 gymnasium sentence-transformers spacy ta requests python-dateutil psutil colorlog
+What it does: Installs all packages the executive summary flagged as missing from requirements.txt for RL/ensemble, news NLP, and feature engineering.
+Special: Use Python 3.10+ environment. These packages were explicitly called out as required. nglish NLP
+COMMAND: python3 -m spacy download en_core_web_lg
+What it does: Downloads the large English language model used for news parsing.
+Special: Requires internet connectivity on first install.
+
+AWS credentials aconfigure — set creds
+
+COMMAND: aws configure
+What it does: Interactively sets AWS Access Key, Secret, default region, and output format for CLI/boto3 use with omega-singularity-ml.
+Special: IAM entity must allow s3:ListBucket and s3:PutObject on the omega-singularity-ml bucket.
+
+S3 list — validate access
+
+COMMAND: aws s3 ls s3://omega-singularity-ml/
+What it does: Verifies you can list the project bucket used for datasets/models.
+Special: Must succeed before feature engineering or training pipelines that read/write S3.
+
+Bucket write test — end-to-end
+
+COMMAND: echo test > test.txt &s3://omega-singularity-ml/ && aws s3 rm s3://omega-singularity-ml/test.txt && del test.txt
+What it does: Quick put/list/delete smoke test to confirm full S3 access.
+Special: On Git Bash, replace del with rm -f test.txt.
+
+IBKR (paper) prerequisites
+
+IB Gateway — confirm API settings
+ACTION: Start IB Gateway (paper) and confirm Host 127.0.0.1, Port 4002, API enabled.
+What it does: Ensures ib_insync can connect to the paper environment on the expected port.
+Special: Paper default is port 4002 per the summary; clientId alignment to 101 is recommended across components.
+
+EC2 access (your exact details; Git Bash and CMD)
+
+EC2 SSH — Git Bash
+
+COMMAND: sshbuntu@18.116.196.223
+What it does: Connects to your Ubuntu EC2 using your key and IP.
+Special: If you see “BAD PERMISSIONS,” run chmod 600 ~/.ssh/Kody.pem and retry.
+
+EC2 SSH — Windows CMD (built-in OpenSSH)
+
+COMMAND: ssh -i %USERPROFILE%.ssh\Kody.pem ubuntu@18.116.196.223
+What it does: Same as above using Windows path syntax.
+Special: If permission errors occur, run: icacls "%USERPROFILE%.ssh\Kody.pem" /inheritance:r /grant:r "%USERNAME%:R" and retry.
+
+EC2 SSH (verbose) — debug
+
+COMMAND: ssh -v -i ~/.ssh/Kody.pem ubuntu@18.116.196.223
+What it does: Prints verbose connection logs to diagnose SSH issues.
+
+Tmux (session management on EC2)
+
+Add new tmux — new session
+
+COMMAND: tmux new -s <choose_session_name>
+What it does: Starts a new named tmux session so long-running processes (e.g., Jupyter, training) persist after you disconnect.
+
+Detach tmux — leave running
+
+KEYS: Ctrl+b then d
+What it does: Detaches from the current tmux session but leaves all processes running in the background.
+
+Reattach tmux — resume session
+
+COMMAND: tmux attach -t <session_name>
+What it does: Reattaches to a previously created tmux session.
+
+(Optional) List tmux sessions — discover names
+
+COMMAND: tmux ls
+What it does: Lists existing tmux sessions if you forget the name.
+
+Jupyter Lab (exact activation + local URL via Git Bash)
+
+Start Jupyter (on EC2 in tmux)
+
+COMMAND: python3 -m pip install --upgrade jupyterlab && jupyter lab --no-browser --ip=127.0.0.1 --port 8888
+What it does: Installs/updates JupyterLab (if needed) and starts it bound to localhost:8888 on the EC2 instance (safer than 0.0.0.0).
+Special: Run inside a tmux session to keep it alive after disconnect.
+
+Open tunnel (on your PC in a new Git Bash)
+
+COMMAND: ssh -i ~/.ssh/Kody.pem -N -L 8888:localhost:8888 ubuntu@18.116.196.223
+What it does: Creates a secure SSH tunnel so your local http://localhost:8888 maps to the remote Jupyter server.
+Special: Keep this window open; then browse to http://localhost:8888. Paste the token from the server output if prompted.
+
+Open tunnel (Windows CMD alternative)
+
+COMMAND: ssh -i %USERPROFILE%.ssh\Kody.pem -N -L 8888:localhost:8888 ubuntu@18.116.196.223
+What it does: Same SSH tunnel using Windows path syntax.
+
+Nano (editing files on EC2)
+
+Nano open — create/edit file
+
+COMMAND: nano <path/to/file.py>
+What it does: Opens (or creates) a text file in the nano editor.
+
+Nano save — write changes
+
+KEYS: Ctrl+O then Enter
+What it does: Saves the current buffer to disk.
+
+Nano exit — close editor
+
+KEYS: Ctrl+X
+What it does: Exits nano (prompts to save if there are changes).
+
+Nano search — find text
+
+KEYS: Ctrl+W
+What it does: Opens a search prompt to find text within the file.
+
+Nano goto line — navigate quickly
+
+KEYS: Ctrl+_
+What it does: Prompts for a line and column number to jump directly.
+
+Nano cut line — remove line to clipboard
+
+KEYS: Ctrl+K
+What it does: Cuts the current line to the nano clipboard.
+
+Nano paste — insert last cut
+
+KEYS: Ctrl+U
+What it does: Pastes the last cut text at the cursor.
+
+Nano undo/redo — fix mistakes
+
+KEYS: Alt+U (undo), Alt+E (redo)
+What it does: Standard undo/redo in nano.
+
+Local data export (optional bootstrap; paper IBKR)
+
+IBKR export — CSVs for symbols
+COMMAND: python3 export_ibkr_data_to_csv.py
+What it does: Exports 1-minute OHLCV for target symbols into /home/ubuntu/data with pacing and chunking defaults.
+Special: Requires IB Gateway (paper) running and API reachable; verify CSVs include expected timestamp/OHLCV columns.
+
+Feature engineering to S3
+
+Features build — process all
+COMMAND: python3 -c "from feature_engineering i   > What it does: Generates engineered features per instrument and writes consolidated outputs to s3://omega-singularity-ml/processed.
+Special: Requires valid AWS credentials and S3 write permissions; raw data must exist in your expected S3 layout.
+
+RL + ensemble training
+
+RL pipeline — run training
+COMMAND: python3 rl_trading_pipeline.py
+What it does: Runs PPO trairains base ML models, fits the meta-model, and persists models under s3://omega-singularity-ml/models/{run_id}/.
+Special: Executive summary flags a syntax error near line ~1484 that must be fixed first; also ensure RealTimeFeatureStore, audit_logging_utils, ingest_to_s3, and market_impact_utils are available or stubbed; align IBKR clientId to 101 across components.
+
+News ingestion and NLP verification
+
+SpaCy load — quick check
+
+COMMAND: python3 -c "import spacy; spacy.load('en_core_web_lg'); print('OK')"
+ms the spaCy model loads without error.
+Special: If this fails, re-run the spaCy model install above.
+
+Transformer load — embeddings check
+
+COMMAND: python3 -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2'); print('OK')"
+nfirms sentence-transformers can instantiate the model (downloads on first run).
+Special: Requires internet on first run.
+
+MarketAux key — set for Git Bash
+
+COMMAND: export MARKET_AUX_API_KEY="YOUR_KEY"
+What it does: Provides the news ingestion code with your API key via environment variable.
+Specia AWS Secrets Manager; the summary notes a hard-coded key should be removed and rotated.
+
+MarketAux key — set for Windows CMD
+
+COMMAND: setx MARKET_AUX_API_KEY "YOUR_KEY"
+What it does: Persists the variable for new CMD sessions.
+Special: Reopen CMD after running setx.
+
+News module — MAND: python3 -c "import news_ingestion_marketaux as m; print('OK')"
+
+What it does: Validates that the news ingestion module imports successfully; ingestion is orchestrated by the pipeline.
+
+Misc. operational checks
+
+Python version — confirm 3.10+
+
+COMMAND: python3 --version
+What it does: Prints the Python version to ensure compatibility with packages.
+
+Torch GPU (optional) — quick check
+
+COMMAND: pythoprint(torch.version); print(torch.cuda.is_available())"
+What it does: Shows Torch version and whether CUDA is available (not required, but useful).
+
+Running each project file (python3-safe invocations)
+
+export_ibkr_data_to_csv.py — run exporter
+
+COMMAND: python3 export_ibkr_data_to_csv.py
+What it does: Triggers the historical export routine to local CSVs.
+
+feature_engineering.py — run main()
+
+COMMAND: python3 -c "from feature_engineering import main; main()"
+What it does: Processes raw data and writes engineered features to S3 under the processed prefix.
+
+rl_trading_pipeline.py — orchestrate ROMMAND: python3 rl_trading_pipeline.py
+
+What it does: End-to-end pipeline: features ingest/merge, PPO, base ML, meta-model, model save to S3, and safeguards. Fix noted issues before use.
+
+news_ingestion_market(module)
+
+COMMAND: python3 -c "import news_ingestion_marketaux; print('OK')"
+What it does: Ensures the module loads; pipeline calls its functions as needed.
+
+market_data_utils.py — import test (module)
+
+COMMAND: python3 -c "import markeOK')"
+What it does: Confirms utilities import; note: RealTimeFeatureStore class referenced by RL may be missing; provide or refactor.
+
+news_data_utils.py — import test (module)
+
+COMMAND: python3 -c "i; print('OK')"
+What it does: Confirms news utility functions import (duplicated with market_data_utils per summary); consider consolidating.
+
+Risk and execution guardrails (awareness)
+
+Review risk constants — before live/paper
+ACTIOLOSS_PCT=0.02, MAX_TRADES_PER_DAY=20, MAX_POSITION_EXPOSURE=3, MAX_ORDER_SIZE=2 match your policy.
+What it does: Ensures hard limits are correctly set prior to execution or backtests.
+Special: RL env terminates at 20% drawdown and u0.0005 by default per summary.

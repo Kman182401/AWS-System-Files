@@ -1,0 +1,173 @@
+Comprehensive System and Process Overview
+
+1. System Architecture & Purpose
+Project Name: Omega Singularity ML
+Environment: Ubuntu 22.04 on AWS EC2 (Instance type: m5.large, 2 vCPUs, 8GB RAM, EBS storage)
+Primary Focus: Modular, production-grade AI/ML pipeline for live day trading, learning-only model deployment, and robust cloud integration.
+
+Key AWS Services Used:
+- S3 (for data/artifact storage)
+- IAM (for access control)
+- SSM (for parameter storage)
+- CloudWatch (for monitoring/logs)
+- Jupyter dashboard (for monitoring/interaction)
+- (Potential: SageMaker/Lambda, not currently in use)
+
+Budget Constraints:
+- AWS cost: ~$70/month (m5.large EC2, EBS)
+- Goal: Avoid unnecessary costs, especially from resource-heavy ML models or services.
+
+Model Inclusion Philosophy:
+- Include as many ML models as possible, prioritizing best and most cost-effective.
+- Start with high-value, low-cost models; expand as resources allow.
+- Guidance required on which models are “worth it” for this setup.
+
+Supported Data Types:
+- Both bar and tick data are supported for maximum learning potential.
+- Willing to adjust if one is clearly superior for the use case.
+
+Log Format/Review:
+- Flexible on log format; manual review is sufficient as long as logs are always up-to-date.
+- No automated alerts required at this stage.
+
+S3 Integration:
+- S3 integration is managed via a Python file (test_s3.py), not by direct bucket name reference.
+- File contents available if needed for integration decisions.
+
+Monitoring/Interface:
+- Jupyter dashboard and CloudWatch are installed and used for monitoring.
+- No additional APIs, GUIs, or automated alerts required at this stage.
+
+2. Machine Learning Model Recommendations & Cost/Usefulness Analysis
+
+Model Type         | Usefulness for Trading | Resource Use (on m5.large) | AWS Cost (Estimate) | Worth It? (for you) | Notes
+-------------------|-----------------------|----------------------------|---------------------|---------------------|------------------------------------------------------
+XGBoost/LightGBM   | Very High             | Moderate                   | Low                 | Yes (start here)    | Best for tabular/feature data, fast, interpretable
+Random Forest      | High                  | Moderate                   | Low                 | Yes (baseline)      | Robust, good for feature importance
+Logistic/Linear    | Moderate              | Very Low                   | Minimal             | Yes (always include)| Fast, interpretable, good baseline
+ARIMA/Prophet      | Moderate              | Very Low                   | Minimal             | Yes (comparison)    | Good for univariate time series
+Small MLP/LSTM     | Moderate-High         | Moderate                   | Low-Moderate        | Yes (if needed)     | Only small models, monitor RAM/CPU
+kNN                | Low-Moderate          | High (RAM)                 | Low                 | Optional            | Only for small datasets
+SVM                | Moderate              | High (RAM/CPU)             | Low-Moderate        | Optional            | Only for small/clean data
+Ensemble (Stacking)| High                  | Additive                   | Additive            | Yes (after singles) | Combine best models for extra boost
+RL (DQN, PPO)      | High (potential)      | Very High                  | High                | No (for now)        | Too resource-intensive for m5.large
+AutoML             | High                  | High                       | High                | No (for now)        | Can be expensive, less control
+
+Cost Notes:
+- All recommended models can run on your m5.large instance with minimal additional AWS cost (just EC2 runtime and EBS storage).
+- Avoid GPU-based models, large deep learning, RL, and AutoML for now due to cost and resource limits.
+
+Worth It Factor:
+- XGBoost/LightGBM, Random Forest, Logistic Regression, ARIMA/Prophet, and small MLP/LSTM are all worth including for your learning-only system.
+- Ensembles are worth it after you have strong single models.
+- kNN, SVM are optional for experimentation.
+- RL and AutoML are not worth it for your current hardware/budget.
+
+3. Compliance, Modularity, and Review Hooks
+
+- All code and processes must comply with Omega’s architectural, anti-dilution, explainability, modularity, market edge, continuous improvement, human review, and best practice standards.
+- Data validation, logging, and human review hooks are required throughout the pipeline.
+- All ML integration should be modular and auditable, with clear extension points for future models or data types.
+
+4. Next Steps
+
+- Use this document as the authoritative system overview for all future ML integration and architectural decisions.
+- Refer to the Baseline file for actionable context and onboarding for ML integration.
+
+--Important Information for Formating Plug and Play Code Requiring Zero User Editing/Additions--
+	-Insatnce Public IP: 18.222.171.151
+	-key.pem=Kody.pem (located in .ssh)
+	-S3 Bucket Name: omega-singularity-ml 
+	-IAM:
+		-Role: OmegaSingularityML-EC2-Role
+		-Policy: OmegaSingularityML-S3-LearnOnly
+		-Policy JSON code: 
+				{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetObject",
+				"s3:PutObject",
+				"s3:ListBucket"
+			],
+			"Resource": [
+				"arn:aws:s3:::omega-singularity-ml",
+				"arn:aws:s3:::omega-singularity-ml/*"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ssm:PutParameter"
+			],
+			"Resource": "arn:aws:ssm:us-east-2:970982543175:parameter/OmegaSingularity/MLPipeline/CloudWatchAgentConfig"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"lambda:UpdateFunctionCode",
+				"lambda:UpdateFunctionConfiguration",
+				"lambda:CreateFunction"
+			],
+			"Resource": "arn:aws:lambda:us-east-2:970982543175:function:*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"lambda:GetLayerVersion"
+			],
+			"Resource": [
+				"arn:aws:lambda:us-east-2:770693421928:layer:Klayers-p39-numpy:*",
+				"arn:aws:lambda:us-east-2:770693421928:layer:Klayers-p39-pandas:*",
+				"arn:aws:lambda:us-east-2:770693421928:layer:Klayers-p39-scikit-learn:*",
+				"arn:aws:lambda:us-east-2:770693421928:layer:Klayers-p39-joblib:*"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"lambda:PublishLayerVersion",
+				"lambda:DeleteLayerVersion",
+				"lambda:GetLayerVersion",
+				"lambda:ListLayerVersions",
+				"lambda:ListLayers"
+			],
+			"Resource": "arn:aws:lambda:us-east-2:970982543175:layer:*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ecr:GetAuthorizationToken",
+				"ecr:CreateRepository",
+				"ecr:DescribeRepositories",
+				"ecr:BatchCheckLayerAvailability",
+				"ecr:PutImage",
+				"ecr:InitiateLayerUpload",
+				"ecr:UploadLayerPart",
+				"ecr:CompleteLayerUpload"
+			],
+			"Resource": "*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"logs:CreateLogGroup",
+				"logs:CreateLogStream",
+				"logs:PutLogEvents",
+				"logs:DescribeLogStreams"
+			],
+			"Resource": "*"
+		}
+	]
+}
+	-AWS Account ID: 970982543175
+	-Lambda Function: OmegaSingularityInference
+	-Instance:
+		-Name: omega-singularity-ml-node
+		-Region US east-2
+		-Type: m5.large
+		-Number of vCPUs: 2
+		-Security Group: sg-0c4ff8d3d5f79920c (Secret Service)
+		-ARN: arn:aws:ec2:us-east-2:970982543175:instance/i-0702f8c220a324e89

@@ -1,0 +1,1 @@
+Run Live Market Data: curl http://127.0.0.1:8000/marketdata?symbol=SPY&interval=1m&lookback=10

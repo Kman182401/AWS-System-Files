@@ -1,0 +1,36 @@
+Feature Consistency Checklist for Live Market Data
+
+1. Add a print statement at the end of your market feature engineering function (e.g., generate_features):
+   print(features.columns)
+   - This will output the exact list of feature names being generated for each ticker.
+
+2. Run your pipeline for a real market ticker (not news).
+   - Look for the output in your terminal that shows the feature columns.
+
+3. Copy the list of feature names from the output (everything inside the square brackets [...]).
+
+4. At the end of your feature engineering function, enforce column order:
+   feature_columns = [list of feature names from step 3]
+   for col in feature_columns:
+       if col not in features:
+           features[col] = np.nan
+   features = features[feature_columns]
+   return features
+
+5. In your pipeline, after feature engineering for each ticker, add an assertion:
+   assert list(features.columns) == feature_columns, f"Feature mismatch for {ticker}: {list(features.columns)}"
+
+6. If you get an assertion error, investigate and fix any inconsistencies in your feature engineering logic.
+
+7. (Optional) Update your config files to ensure all tickers use the same feature set.
+
+8. Once you confirm feature consistency, remove or comment out the print statements.
+
+This process ensures your ML and RL models always receive the same features, in the same order, for every ticker—critical for robust, production-grade trading.
+
+Steps to WAIT on until you have live market data:
+
+1. Extract the exact list of feature names from your real market data after running feature engineering.
+2. Enforce column order at the end of your feature function using the real feature list.
+3. Add feature consistency assertions in your pipeline using the real feature list.
+4. Update any config files or model code that depend on the final, real feature set.

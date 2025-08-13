@@ -1,0 +1,161 @@
+(ml_env) ubuntu@ip-172-31-18-179:~$ python3 rl_trading_pipeline.py
+2025-08-04 07:45:06 | ERROR    | ib_insync.client | API connection failed: ConnectionRefusedError(111, "Connect call failed ('127.0.0.1', 4000)")
+--------------------------------------------------------------------------------
+2025-08-04 07:45:06 | ERROR    | ib_insync.client | Make sure API port on TWS/IBG is open
+--------------------------------------------------------------------------------
+Warning: IBKR connection failed: [Errno 111] Connect call failed ('127.0.0.1', 4000). Running in test mode with no market data.
+2025-08-04 07:45:06,991 INFO pipeline_start: run_id=20250804_074506
+2025-08-04 07:45:06 | INFO     | trade_logger | pipeline_start: run_id=20250804_074506
+--------------------------------------------------------------------------------
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+2025-08-04 07:45:07 | WARNING  | root | ML SYSTEM: Running ML model training and prediction for all tickers.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | WARNING  | root | Not enough data for ES1!: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | WARNING  | root | Not enough data for NQ1!: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | WARNING  | root | Not enough data for AUDUSD: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | WARNING  | root | Not enough data for GBPUSD: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | WARNING  | root | Not enough data for EURUSD: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | WARNING  | root | Not enough data for XAUUSD: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+
+=== ML Model Performance Summary ===
+Empty DataFrame
+Columns: []
+Index: []
+2025-08-04 07:45:07 | WARNING  | root | RL SYSTEM: Running PPO RL training and inference.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | WARNING  | root | META-MODEL SYSTEM: Running stacking/meta-model training and prediction.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | ERROR    | __main__ | No valid meta_X rows to fit meta-model. Skipping meta-model training for this run.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07 | WARNING  | root | ENSEMBLE SYSTEM: Running ensemble voting for all tickers.
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07,382 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/ES1!_features.csv
+2025-08-04 07:45:07 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/ES1!_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074506/ES1!_features.csv
+2025-08-04 07:45:07,491 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/NQ1!_features.csv
+2025-08-04 07:45:07 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/NQ1!_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074506/NQ1!_features.csv
+2025-08-04 07:45:07,627 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/AUDUSD_features.csv
+2025-08-04 07:45:07 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/AUDUSD_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074506/AUDUSD_features.csv
+2025-08-04 07:45:07,741 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/GBPUSD_features.csv
+2025-08-04 07:45:07 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/GBPUSD_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074506/GBPUSD_features.csv
+2025-08-04 07:45:07,857 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/EURUSD_features.csv
+2025-08-04 07:45:07 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/EURUSD_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074506/EURUSD_features.csv
+2025-08-04 07:45:07,972 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/XAUUSD_features.csv
+2025-08-04 07:45:07 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074506/XAUUSD_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074506/XAUUSD_features.csv
+2025-08-04 07:45:07,973 INFO pipeline_success: run_id=20250804_074506
+2025-08-04 07:45:07 | INFO     | trade_logger | pipeline_success: run_id=20250804_074506
+--------------------------------------------------------------------------------
+2025-08-04 07:45:07,974 INFO pipeline_complete: run_id=20250804_074506
+2025-08-04 07:45:07 | INFO     | trade_logger | pipeline_complete: run_id=20250804_074506
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | ERROR    | ib_insync.client | API connection failed: ConnectionRefusedError(111, "Connect call failed ('127.0.0.1', 4000)")
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | ERROR    | ib_insync.client | Make sure API port on TWS/IBG is open
+--------------------------------------------------------------------------------
+Warning: IBKR connection failed: [Errno 111] Connect call failed ('127.0.0.1', 4000). Running in test mode with no market data.
+2025-08-04 07:47:08,048 INFO pipeline_start: run_id=20250804_074708
+2025-08-04 07:47:08 | INFO     | trade_logger | pipeline_start: run_id=20250804_074708
+--------------------------------------------------------------------------------
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+/home/ubuntu/feature_engineering.py:150: FutureWarning: 'T' is deprecated and will be removed in a future version, please use 'min' instead.
+  df["timestamp"] = pd.date_range(start="2000-01-01", periods=len(df), freq="T")
+2025-08-04 07:47:08 | WARNING  | root | ML SYSTEM: Running ML model training and prediction for all tickers.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | WARNING  | root | Not enough data for ES1!: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | WARNING  | root | Not enough data for NQ1!: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | WARNING  | root | Not enough data for AUDUSD: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | WARNING  | root | Not enough data for GBPUSD: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | WARNING  | root | Not enough data for EURUSD: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | WARNING  | root | Not enough data for XAUUSD: X_train=0, X_test=1. Skipping.
+--------------------------------------------------------------------------------
+
+=== ML Model Performance Summary ===
+Empty DataFrame
+Columns: []
+Index: []
+2025-08-04 07:47:08 | WARNING  | root | RL SYSTEM: Running PPO RL training and inference.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | WARNING  | root | META-MODEL SYSTEM: Running stacking/meta-model training and prediction.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | ERROR    | __main__ | No valid meta_X rows to fit meta-model. Skipping meta-model training for this run.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08 | WARNING  | root | ENSEMBLE SYSTEM: Running ensemble voting for all tickers.
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08,392 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/ES1!_features.csv
+2025-08-04 07:47:08 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/ES1!_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074708/ES1!_features.csv
+2025-08-04 07:47:08,513 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/NQ1!_features.csv
+2025-08-04 07:47:08 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/NQ1!_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074708/NQ1!_features.csv
+2025-08-04 07:47:08,621 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/AUDUSD_features.csv
+2025-08-04 07:47:08 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/AUDUSD_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074708/AUDUSD_features.csv
+2025-08-04 07:47:08,742 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/GBPUSD_features.csv
+2025-08-04 07:47:08 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/GBPUSD_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074708/GBPUSD_features.csv
+2025-08-04 07:47:08,857 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/EURUSD_features.csv
+2025-08-04 07:47:08 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/EURUSD_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074708/EURUSD_features.csv
+2025-08-04 07:47:08,978 INFO S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/XAUUSD_features.csv
+2025-08-04 07:47:08 | INFO     | trade_logger | S3_UPLOAD_SUCCESS: bucket=omega-singularity-ml, key=features/20250804_074708/XAUUSD_features.csv
+--------------------------------------------------------------------------------
+Upload successful: s3://omega-singularity-ml/features/20250804_074708/XAUUSD_features.csv
+2025-08-04 07:47:08,979 INFO pipeline_success: run_id=20250804_074708
+2025-08-04 07:47:08 | INFO     | trade_logger | pipeline_success: run_id=20250804_074708
+--------------------------------------------------------------------------------
+2025-08-04 07:47:08,980 INFO pipeline_complete: run_id=20250804_074708
+2025-08-04 07:47:08 | INFO     | trade_logger | pipeline_complete: run_id=20250804_074708
+--------------------------------------------------------------------------------
+^CTraceback (most recent call last):
+  File "/home/ubuntu/rl_trading_pipeline.py", line 921, in <module>
+    time.sleep(120)
+KeyboardInterrupt
+
+(ml_env) ubuntu@ip-172-31-18-179:~$

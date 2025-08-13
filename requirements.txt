@@ -1,0 +1,9 @@
+boto3
+pandas
+scikit-learn
+joblib
+numpy
+torch
+scikit-learn
+watchtower
+ib_insync

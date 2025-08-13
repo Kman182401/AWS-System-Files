@@ -1,0 +1,196 @@
+
+GLOBAL
+------
+Display Name ▶ Hannah
+Role/Focus ▶ 
+Timezone (e.g., US/Eastern) ▶ US/Eastern 
+Units (USD/metric/imperial) ▶ USD
+Default Output Format (e.g., concise + bullets) ▶ 
+Markdown OK? (Yes/No) ▶ 
+Long-form OK? (Yes/No) ▶ 
+
+PRIVACY & KEYS (Do NOT paste keys here; just note where they live)
+------------------------------------------------------------------
+PII Handling (e.g., minimize + redact) ▶ 
+Data Retention (days) ▶ 
+Log Sensitive Data? (Yes/No) ▶ 
+Key Vault Location (e.g., iCloud Keychain / 1Password / AWS Secrets) ▶ 
+
+CHANNELS
+--------
+Alerts (e.g., Telegram, Discord) ▶ 
+Reports (e.g., Email Daily 07:30, Notion /Daily-Digest) ▶ 
+
+MEMORY POLICY
+-------------
+Remember (topics the agent should remember; comma-separated) ▶ 
+Forget (things never stored long-term; comma-separated) ▶ 
+
+NEWS FILTER (Optional)
+----------------------
+Coverage Topics (e.g., macro, AI/ML, regulation) ▶ 
+Excluded Topics ▶ 
+Allowlist Sources (e.g., FT, WSJ, Reuters, AP, Nature) ▶ 
+Bias Balance (centered/pluralistic/etc.) ▶ 
+Max Items/Day ▶ 
+Delivery Times (e.g., 07:30, 17:30) ▶ 
+
+TRADING DASHBOARD (Optional)
+----------------------------
+Broker/Exchange (e.g., Alpaca, IBKR) ▶ 
+Data Feeds (e.g., Polygon.io, IB TWS) ▶ 
+Symbols (e.g., SPY, NVDA, BTCUSDT) ▶ 
+Latency Target (ms) ▶ 
+Risk Limits: Max Gross ▶ 
+Risk Limits: Max Leverage ▶ 
+Per-Trade Risk % ▶ 
+Daily Drawdown Stop % ▶ 
+Algo Entry Point (URL or path) ▶ 
+Backtest Engine (e.g., vectorbt/backtrader) ▶ 
+Paper Trading by Default? (Yes/No) ▶ 
+LIVE Toggle Keyword ▶ 
+
+FINANCE TRACKER (Optional)
+--------------------------
+Aggregator (e.g., Plaid) ▶ 
+Base Currency ▶ 
+Budget Categories Scheme (e.g., YNAB-like) ▶ 
+Forecast Horizon (months) ▶ 
+Overspend Alert Threshold % ▶ 
+Savings Targets (name: amount; one per line) ▶ 
+
+SMART KNOWLEDGE VAULT (Optional)
+--------------------------------
+Sources (e.g., Notion, Obsidian, Google Drive, Bookmarks) ▶ 
+Entity Types (e.g., Project, Paper, Dataset, Codebase) ▶ 
+Relations (e.g., cites, implements, derived-from) ▶ 
+Tag Conventions (e.g., k:topic/*, k:status/{todo,doing,done}) ▶ 
+Dedup Rules (e.g., title+url, fuzzy 90%) ▶ 
+
+AI STUDY PARTNER — CORE
+-----------------------
+Campus ▶ Georgia Gwinnett College 
+Degree Program ▶ Business Administration Marketing 
+Year (e.g., Sophomore) ▶ Senior 
+GPA Goal ▶ 3.6
+Languages ▶ English 
+Honor Code URL ▶ 
+
+Allowed Assistance (check ✔ or leave blank)
+[ ✔️] Explanations
+[ ✔️] Worked Examples
+[ ✔️] Rubric Alignment
+[ ✔️] Outline/Planning
+[ ] Debugging/Code Help
+[ ✔️] Practice Quizzes
+[ ✔️] Plagiarism Pre-check
+
+Disallowed Assistance (add if any) ▶ 
+
+Accommodations (Optional)
+-------------------------
+Extended Time % ▶ 25
+Font Size ▶ Large 
+Dyslexia-Friendly Mode? (Yes/No) ▶ No
+
+Schedule Capacity
+-----------------
+Weekly Study Hours Target ▶ 20
+Blocked Class Hours (e.g., Mon 09:00–12:00) ▶ Tuesday 09:30am-01:45pm
+Wednesday 09:30am-10:45am
+Thursday 09:30am-01:45pm
+Work/Extracurricular Blocks ▶ 
+Sleep Window ▶ 11:00pm-08:00am
+Preferred Study Blocks ▶ weekdays 
+No-Study Times ▶ weekends 
+Calendar Integrations (Google email, Canvas/Blackboard ics) ▶ hannahkluesner@gmail.com
+Reminder Lead Times (e.g., 24h, 4h, 1h) ▶ 4h
+Notification Channels (Discord/Email/etc.) ▶ hannahkluesner@gmail.com
+
+Learning Profile
+----------------
+Modalities (text/code/math/diagrams/audio) ▶ text/math/diagrams
+Strengths ▶ math
+Weaknesses ▶ long-form writing 
+Preferred Explanations (gist/worked example/edge cases/pitfalls) ▶ worked example/gist
+Rigor Level (intro/undergrad/upper-undergrad/grad) ▶ upper-undergrad 
+Quiz Styles (MCQ/Socratic/Coding/Scenario/ProofSketch/etc.) ▶ Socratic/scenario 
+Spaced Repetition (On/Off + Daily New Cards) ▶ on/off + daily new cards 
+
+Writing Profile
+---------------
+Dialect (e.g., US English) ▶ US English 
+Tone (e.g., formal, precise, evidence-driven) ▶ formal/evidence driven 
+Default Citation Style (e.g., APA/MLA/Chicago) ▶ APA
+Banned Phrases ▶ “in conclusion” 
+Target Grade ▶ A
+Rubric Links (paste URLs) ▶ 
+Voice Samples (URLs to your past work) ▶ 
+
+Tools & Connectors
+------------------
+Search APIs (e.g., Semantic Scholar, Crossref, arXiv) ▶ 
+Library Proxy URL (if any) ▶ 
+Note Systems (Notion/Obsidian/GDrive) ▶ 
+Reference Manager (e.g., Zotero) ▶ 
+LMS (Canvas/Blackboard) ▶ 
+Code Exec (e.g., python-sandbox) ▶ 
+PDF OCR (Yes/No) ▶ 
+
+COURSES (Repeat for each course)
+--------------------------------
+Course Code ▶ 
+Title ▶ 
+Section ▶ 
+Instructor (Name, Email, Office Hours, Location) ▶ 
+Class Times (e.g., Mon 10:00–10:50; Wed 10:00–10:50) ▶ 
+Midterm Dates ▶ 
+Final Date ▶ 
+Grade Weights (e.g., HW 20, Quizzes 10, Midterms 40, Final 30) ▶ 
+Textbooks (Title, Edition, Chapters) ▶ 
+Syllabus URL ▶ 
+Topics Map (Topic → Skills → Prereqs) ▶ 
+Assignment Preferences (deadline buffer hours; hint depth; show common errors?) ▶ 
+Quiz Settings (difficulty curve; include proof sketches? include graphics?) ▶ 
+
+ASSIGNMENTS OVERRIDES (Ad-hoc)
+-------------------------------
+(For assignments not tied to a course)
+Title ▶ 
+Course ▶ 
+Due Date ▶ 
+Instructions/Constraints ▶ 
+Allowed Assistance ▶ 
+
+ESSAY DEFAULTS
+--------------
+Min Reading List Items ▶ 
+Diversity of Sources (peer-reviewed/books/news) ▶ peer-reviewed/ scholar articles 
+Outline Depth ▶ 
+Anti-Hallucination Mode (strict/moderate) ▶ 
+Originality Target % ▶ 
+
+STUDY TARGETS (Weekly)
+----------------------
+- Course ▶ ; Hours ▶ ; Outcomes ▶ 
+- Course ▶ ; Hours ▶ ; Outcomes ▶ 
+
+EXAM CRAM RULES
+---------------
+Ramp Days ▶ 
+Mock Exam Count ▶ 
+Weakest First? (Yes/No) ▶ 
+
+PRIVACY & EXPORT
+----------------
+Store Personal Data Locally? (Yes/No) ▶ 
+Redact PII in Logs? (Yes/No) ▶ 
+Data Retention (days) ▶ 
+Export Formats (CSV/Markdown/Anki/BibTeX) ▶ 
+
+COST CONTROLS
+-------------
+Daily LLM Cost Cap (USD) ▶ 
+Model Fallbacks (e.g., gpt-5-pro, gpt-4o-mini, local-7b) ▶ 
+
+END OF FORM

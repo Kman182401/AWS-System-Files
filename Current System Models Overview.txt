@@ -1,0 +1,74 @@
+1. SentenceTransformer (News Embedding Model)
+   - Turns news headlines or descriptions into a list of numbers (an “embedding”) that captures the meaning of the text.
+   - Every time a news article comes in, the system uses SentenceTransformer to convert the text into an embedding.
+   - These embeddings are compared to embeddings of past impactful news using cosine similarity.
+   - If a new article is similar to past impactful news, it’s flagged as potentially important for trading.
+   - This lets your system “understand” news and spot when something similar to a past market-moving event is happening again.
+
+2. PassiveAggressiveClassifier (Online Linear Classifier)
+   - Predicts if the market will go up or down (or other classes) based on features from market and news data.
+   - When new labeled data (features + outcome) is available, the model is updated using .partial_fit().
+   - If it predicts correctly, it does nothing. If it’s wrong, it updates its internal weights to avoid making the same mistake again.
+   - It’s always ready to learn from new data, so it adapts quickly to changing market conditions.
+   - It’s fast, lightweight, and can keep learning as new data arrives, making it ideal for streaming or live trading.
+
+3. SGDClassifier (Stochastic Gradient Descent Classifier)
+   - Another linear classifier, but uses a different learning rule (SGD) to update its weights.
+   - Like PassiveAggressive, it uses .partial_fit() to update with new data as it arrives.
+   - It can learn from both mistakes and successes, adjusting its weights a little bit each time.
+   - It’s also fast and good for online learning.
+   - Provides a different “view” of the data, which can help the ensemble make better decisions.
+
+4. RandomForestClassifier (Ensemble of Decision Trees)
+   - Builds a “forest” of decision trees, each making its own prediction. The final answer is the majority vote of all the trees.
+   - When enough new data is available, the model is retrained from scratch using .fit().
+   - It can capture complex, nonlinear relationships in the data that linear models might miss.
+   - It’s not updated in real time, but is periodically retrained to stay current.
+   - Adds diversity and power to your ensemble, especially for patterns that aren’t just straight lines.
+
+5. PPO (Proximal Policy Optimization, RL Agent)
+   - Learns to make trading decisions (buy, sell, hold) by trial and error, always trying to maximize its reward (profit).
+   - The PPO agent interacts with a simulated or live trading environment.
+   - It observes the current state (market data, news embeddings, etc.), takes an action, and receives a reward.
+   - It updates its policy using the PPO algorithm, which makes sure it doesn’t change too much at once.
+   - It can be retrained as new data arrives, so it keeps getting smarter.
+   - Can learn complex trading strategies that adapt to changing market conditions and news events.
+
+6. RLTradingPipeline (Orchestrator for RL Training and Inference)
+   - Manages the training, evaluation, and deployment of your RL agent (like PPO).
+   - Sets up the trading environment and agent.
+   - Runs the training loop, collects experience, updates the agent, and logs results.
+   - Can switch to live or paper trading mode, where it uses the trained agent to make real-time decisions.
+   - Automates the process of making your RL agent smarter and deploying it for real or simulated trading.
+
+7. PPOTrainingLogger (RL Training Logger/Callback)
+   - Keeps track of how well your RL agent is learning.
+   - Logs metrics like rewards, losses, and steps during training.
+   - Can save the best models, plot learning curves, and help you debug or tune your agent.
+   - Gives you visibility into your agent’s learning process and helps you improve it.
+
+How They Work Together: Stacking, Voting, and Ensemble Logic
+   - Your system uses multiple models (PassiveAggressive, SGD, RandomForest, possibly others) to make predictions on the same data.
+   - Their predictions are combined using ensemble methods:
+     - Voting: Each model votes for its prediction (e.g., up or down). The majority wins.
+     - Stacking: The outputs of the base models are fed into a “meta-model” (often another classifier) that learns how to best combine their predictions for the final decision.
+   - No single model is perfect. By combining different models, you get more robust, accurate, and stable predictions.
+   - If one model misses something, another might catch it. The ensemble “hedges its bets” and usually outperforms any single model.
+   - The ensemble’s final prediction is used to make trading decisions (e.g., buy, sell, hold).
+   - The system can adapt as new data arrives, updating the models and the ensemble to stay smart in changing markets.
+
+Plain English Example: How It All Comes Together
+   1. News comes in:
+      - SentenceTransformer turns it into numbers.
+      - The system checks if it’s similar to past impactful news.
+   2. Market data and features are prepared.
+   3. Each model makes a prediction:
+      - PassiveAggressive and SGD (fast, linear) make their calls.
+      - RandomForest (complex, nonlinear) makes its call.
+      - PPO (RL agent) may also make a decision based on its learned policy.
+   4. Ensemble combines predictions:
+      - Voting or stacking logic decides the final action.
+   5. Action is taken:
+      - The system (in live or paper mode) places a trade.
+   6. Learning continues:
+      - As new data and outcomes come in, the models (except RandomForest, which is retrained periodically) update themselves to get smarter.

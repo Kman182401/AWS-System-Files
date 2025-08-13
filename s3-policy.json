@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowEC2RoleListBucket",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::970982543175:role/OmegaSingularityML-EC2-Role"
+            },
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::omega-singularity-ml"
+        },
+        {
+            "Sid": "AllowEC2RoleGetPutObject",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::970982543175:role/OmegaSingularityML-EC2-Role"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:::omega-singularity-ml/*"
+        }
+    ]
+}
